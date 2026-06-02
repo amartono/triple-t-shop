@@ -6,7 +6,17 @@ A fully-featured WordPress + WooCommerce e-commerce site for Sahur (pre-dawn Ram
 
 ## Fresh Machine Setup (Nothing Installed)
 
-This guide assumes you have a **brand new Mac with nothing installed**. Follow every step in order.
+This guide assumes you have a **brand new Mac with nothing installed**.
+
+### One-Command Install (Recommended)
+
+```bash
+curl -sSL https://raw.githubusercontent.com/amartono/triple-t-shop/main/install.sh | bash
+```
+
+That's it. The script auto-installs Homebrew, PHP, MySQL, Apache, clones the project, imports the database, and configures everything. When it finishes, open **http://localhost:8080**.
+
+### Step-by-Step (If you prefer manual control)
 
 ### Step 1: Install Homebrew
 
