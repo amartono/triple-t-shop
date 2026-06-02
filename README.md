@@ -4,7 +4,7 @@ A full-featured Sahur (pre-dawn Ramadan meal) e-commerce website built on WordPr
 
 ## One-Click Setup
 
-Clone and run on any fresh Mac:
+### macOS
 
 ```bash
 git clone https://github.com/amartono/triple-t-shop.git
@@ -12,18 +12,34 @@ cd triple-t-shop
 bash install.sh
 ```
 
-The script auto-installs everything — Homebrew, PHP, MySQL, Apache, WordPress, WooCommerce, all plugins, products, and content. No configuration needed.
-
-When it finishes:
+The script auto-installs Homebrew, PHP, MySQL, Apache, WordPress, WooCommerce, all plugins, products, and content. No configuration needed.
 
 - **Website:** http://localhost:8080
-- **Admin panel:** http://localhost:8080/wp-admin
+
+### Windows (WSL2 Ubuntu)
+
+```bash
+git clone https://github.com/amartono/triple-t-shop.git
+cd triple-t-shop
+bash install-windows.sh
+```
+
+The script auto-installs Nginx, PHP, MariaDB, WordPress, WooCommerce, all plugins, products, and content. No configuration needed.
+
+- **Website:** http://localhost
 
 ## Start / Stop
 
+**macOS:**
 ```bash
 brew services start mysql && brew services start httpd   # Start
 brew services stop mysql && brew services stop httpd      # Stop
+```
+
+**Windows (WSL):**
+```bash
+bash start.sh     # Start nginx, MariaDB, PHP
+bash stop.sh      # Stop all services
 ```
 
 ## Features
@@ -47,14 +63,18 @@ brew services stop mysql && brew services stop httpd      # Stop
 | Username | `admin` |
 | Password | *(reset after first login)* |
 
-Reset the password:
-
+**macOS:**
 ```bash
 wp user update 1 --user_pass=yournewpassword
 ```
 
+**Windows (WSL):**
+```bash
+sudo -u www-data wp user update 1 --user_pass=yournewpassword
+```
+
 ## Requirements
 
-- macOS (Apple Silicon or Intel)
-- Internet connection (pulls Homebrew + dependencies)
+- macOS (Apple Silicon or Intel) — or — Windows 10/11 with WSL2 Ubuntu
+- Internet connection (pulls dependencies)
 - 2GB+ disk space
