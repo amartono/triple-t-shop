@@ -559,6 +559,17 @@ body.ttt-logged-in.page-id-9 .u-columns#customer_login { display: none !importan
     }
 });
 
+// Hide register/login link on page content when logged in
+add_filter( 'the_content', function( $content ) {
+    if ( is_page( 9 ) && is_user_logged_in() ) {
+        $content = preg_replace( '/<p[^>]*>Don.*?have an account\?.*?<\\/p>/i', '', $content );
+    }
+    if ( is_page( 80 ) && is_user_logged_in() ) {
+        $content = preg_replace( '/<p[^>]*>Already have an account\?.*?<\\/p>/i', '', $content );
+    }
+    return $content;
+}, 99 );
+
 // Header nav position lock
 add_action('wp_head', function(){
     /**
