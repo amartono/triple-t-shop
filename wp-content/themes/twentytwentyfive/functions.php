@@ -438,6 +438,20 @@ add_filter( 'gettext', function ( $translation, $text, $domain ) {
 	return $translation;
 }, 10, 3 );
 
+// Add register link below login form
+add_action( 'woocommerce_login_form_end', function () {
+	if ( is_page( 9 ) ) {
+		echo '<p style="text-align:center;margin-top:16px;color:#555;font-size:0.9rem;">Don\'t have an account? <a href="http://localhost:8080/?page_id=80" style="color:#C6742E;font-weight:600;text-decoration:none;">Create one here</a></p>';
+	}
+});
+
+// Add login link below register form
+add_action( 'woocommerce_register_form_end', function () {
+	if ( is_page( 80 ) ) {
+		echo '<p style="text-align:center;margin-top:16px;color:#555;font-size:0.9rem;">Already have an account? <a href="http://localhost:8080/?page_id=9" style="color:#C6742E;font-weight:600;text-decoration:none;">Log in here</a></p>';
+	}
+});
+
 // Validate registration password
 add_filter( 'woocommerce_registration_errors', function ( $errors, $username, $email ) {
 	if ( ! empty( $_POST['password'] ) && strlen( $_POST['password'] ) < 6 ) {
