@@ -1,159 +1,60 @@
 # Triple T Shop (Tung Tung Tung Sahur)
 
-A fully-featured WordPress + WooCommerce e-commerce site for Sahur (pre-dawn Ramadan meal) essentials. Features a custom 2FA login system, AI chatbot, product search, and a warm earthy-themed design.
+A full-featured Sahur (pre-dawn Ramadan meal) e-commerce website built on WordPress + WooCommerce.
 
----
+## One-Click Setup
 
-## Fresh Machine Setup (Nothing Installed)
-
-This guide assumes you have a **brand new Mac with nothing installed**.
-
-### One-Command Install (Recommended)
-
-```bash
-curl -sSL https://raw.githubusercontent.com/amartono/triple-t-shop/main/install.sh | bash
-```
-
-That's it. The script auto-installs Homebrew, PHP, MySQL, Apache, clones the project, imports the database, and configures everything. When it finishes, open **http://localhost:8080**.
-
-### Step-by-Step (If you prefer manual control)
-
-### Step 1: Install Homebrew
-
-Homebrew installs everything else. Paste this in Terminal:
-
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
-
-After it finishes, follow the "Next Steps" it prints (adds brew to your PATH).
-
-### Step 2: Install PHP, MySQL, Apache & Git
-
-```bash
-brew install php mysql httpd git
-```
-
-### Step 3: Start MySQL & Apache
-
-```bash
-brew services start mysql
-brew services start httpd
-```
-
-### Step 4: Create the Database
-
-```bash
-mysql -u root -e "CREATE DATABASE wordpress CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-```
-
-### Step 5: Clone and Setup the Project
+Clone and run on any fresh Mac:
 
 ```bash
 git clone https://github.com/amartono/triple-t-shop.git
 cd triple-t-shop
-./setup.sh
+bash install.sh
 ```
 
-### Step 6: Edit Database Config
+The script auto-installs everything — Homebrew, PHP, MySQL, Apache, WordPress, WooCommerce, all plugins, products, and content. No configuration needed.
 
-Open `wp-config.php` and update these lines:
+When it finishes:
 
-```php
-define( 'DB_NAME', 'wordpress' );   // keep as-is
-define( 'DB_USER', 'root' );        // keep as-is (default macOS MySQL)
-define( 'DB_PASSWORD', '' );        // keep empty (default macOS MySQL has no password)
-define( 'DB_HOST', 'localhost' );   // keep as-is
-```
+- **Website:** http://localhost:8080
+- **Admin panel:** http://localhost:8080/wp-admin
 
-### Step 7: Import the Database
+## Start / Stop
 
 ```bash
-mysql -u root wordpress < triple-t-shop-dump.sql
+brew services start mysql && brew services start httpd   # Start
+brew services stop mysql && brew services stop httpd      # Stop
 ```
 
-### Step 8: Point Apache to the Project
+## Features
 
-Edit Apache config to serve from this folder:
+- 16 Sahur-themed products with playful names (Platriple T, Tungbler, Sahur Box)
+- 2FA login with email OTP verification (Gmail SMTP)
+- AI chatbot for product questions and shopping help
+- AJAX product search with autocomplete
+- Carousel homepage with blurred background images
+- 7 product categories (Kitchen, Drinkware, Food Storage, Apparel, etc.)
+- Coupons: SAHUR10 (10%), TRIPLET20 (20%), FREESHIP
+- Payment: bank transfer, check, cash on delivery
+- Free shipping (USA zone)
+- Login required for checkout
+- Responsive warm earthy theme (brown, amber, gold)
 
-```bash
-# Open config
-nano /opt/homebrew/etc/httpd/httpd.conf
+## Admin Account
 
-# Find "DocumentRoot" and change it to:
-DocumentRoot "/path/to/triple-t-shop"
+| Field | Value |
+|---|---|
+| Username | `admin` |
+| Password | *(reset after first login)* |
 
-# Also find <Directory> and change the path to match
-
-# Then enable mod_rewrite by uncommenting this line:
-LoadModule rewrite_module lib/httpd/modules/mod_rewrite.so
-
-# Restart Apache
-brew services restart httpd
-```
-
-### Step 9: Open the Site
-
-Go to **http://localhost:8080** in your browser.
-
----
-
-## Quick Reference (After First Setup)
-
-If you've already installed everything and just need to restart:
-
-```bash
-# Start services
-brew services start mysql
-brew services start httpd
-
-# Stop services
-brew services stop mysql
-brew services stop httpd
-```
-
----
-
-## Admin Login
-
-- **URL:** http://localhost:8080/wp-admin
-- **Username:** `admin`
-- **Password:** Reset it with:
+Reset the password:
 
 ```bash
 wp user update 1 --user_pass=yournewpassword
 ```
 
----
+## Requirements
 
-## Features
-
-| Feature | Description |
-|---------|-------------|
-| **16 Products** | Sahur-themed essentials (Platriple T, Tungbler, Sahur Box, etc.) |
-| **2FA Login** | Email OTP verification via Gmail SMTP |
-| **AI Chatbot** | Floating chat button — ask about products, add to cart |
-| **Product Search** | AJAX autocomplete with partial matching |
-| **7 Categories** | Kitchen & Dining, Drinkware, Food Storage, Apparel, etc. |
-| **Coupons** | SAHUR10 (10%), TRIPLET20 (20%), FREESHIP |
-| **Payment Methods** | Bank transfer, check, cash on delivery |
-| **Free Shipping** | USA zone |
-| **Checkout Gate** | Guests must login to checkout |
-| **Dashboard** | Sidebar layout (orders, addresses, downloads) |
-| **Carousel** | Blurred background image slider on homepage |
-
----
-
-## Troubleshooting
-
-| Issue | Fix |
-|-------|-----|
-| **"command not found: brew"** | Homebrew didn't install. Go back to Step 1. |
-| **"command not found: mysql"** | Run `brew install mysql` |
-| **MySQL won't start** | Run `brew services restart mysql` |
-| **Apache won't start** | Run `brew services restart httpd` |
-| **White screen on site** | Check `wp-config.php` has correct DB credentials |
-| **Database import fails** | Make sure MySQL is running: `brew services start mysql` |
-| **404 on pages** | Enable mod_rewrite in Apache config (Step 8) |
-| **"Error establishing database connection"** | MySQL isn't running or DB credentials are wrong |
-| **Images broken** | Complete WordPress install — visit http://localhost:8080/wp-admin once |
+- macOS (Apple Silicon or Intel)
+- Internet connection (pulls Homebrew + dependencies)
+- 2GB+ disk space
