@@ -4,99 +4,114 @@ A fully-featured WordPress + WooCommerce e-commerce site for Sahur (pre-dawn Ram
 
 ---
 
-## Prerequisites
+## Fresh Machine Setup (Nothing Installed)
 
-- **PHP** 7.4+ (8.0+ recommended)
-- **MySQL** 5.7+ or MariaDB 10.3+
-- **Apache** with `mod_rewrite` enabled (or Nginx)
-- **Composer** (optional, for future package management)
+This guide assumes you have a **brand new Mac with nothing installed**. Follow every step in order.
 
-## Quick Start
+### Step 1: Install Homebrew
 
-### 1. Clone the Repository
+Homebrew installs everything else. Paste this in Terminal:
+
 ```bash
-git clone <repo-url> triple-t-shop
-cd triple-t-shop
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-### 2. Run the Setup Script
+After it finishes, follow the "Next Steps" it prints (adds brew to your PATH).
+
+### Step 2: Install PHP, MySQL, Apache & Git
+
 ```bash
+brew install php mysql httpd git
+```
+
+### Step 3: Start MySQL & Apache
+
+```bash
+brew services start mysql
+brew services start httpd
+```
+
+### Step 4: Create the Database
+
+```bash
+mysql -u root -e "CREATE DATABASE wordpress CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+```
+
+### Step 5: Clone and Setup the Project
+
+```bash
+git clone https://github.com/amartono/triple-t-shop.git
+cd triple-t-shop
 ./setup.sh
 ```
-This will:
-- Copy `wp-config.example.php` → `wp-config.php`
-- Copy `smtp.php.example` → `wp-content/mu-plugins/smtp.php`
-- Copy `chatbot.js.example` → `wp-content/themes/twentytwentyfive/assets/js/chatbot.js`
 
-### 3. Configure Database Credentials
-Edit `wp-config.php` and update:
+### Step 6: Edit Database Config
+
+Open `wp-config.php` and update these lines:
+
 ```php
-define( 'DB_NAME', 'wordpress' );
-define( 'DB_USER', 'root' );
-define( 'DB_PASSWORD', 'your_password_here' );
-define( 'DB_HOST', 'localhost' );
+define( 'DB_NAME', 'wordpress' );   // keep as-is
+define( 'DB_USER', 'root' );        // keep as-is (default macOS MySQL)
+define( 'DB_PASSWORD', '' );        // keep empty (default macOS MySQL has no password)
+define( 'DB_HOST', 'localhost' );   // keep as-is
 ```
 
-### 4. Create & Import Database
+### Step 7: Import the Database
+
 ```bash
-# Create the database
-mysql -u root -p -e "CREATE DATABASE wordpress CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-
-# Import the database dump
-mysql -u root -p wordpress < triple-t-shop-dump.sql
+mysql -u root wordpress < triple-t-shop-dump.sql
 ```
 
-### 5. Configure Web Server
-Point your Apache/Nginx document root to this directory:
-```
-DocumentRoot /path/to/triple-t-shop
-```
+### Step 8: Point Apache to the Project
 
-Enable `mod_rewrite` in Apache:
+Edit Apache config to serve from this folder:
+
 ```bash
-sudo a2enmod rewrite
+# Open config
+nano /opt/homebrew/etc/httpd/httpd.conf
+
+# Find "DocumentRoot" and change it to:
+DocumentRoot "/path/to/triple-t-shop"
+
+# Also find <Directory> and change the path to match
+
+# Then enable mod_rewrite by uncommenting this line:
+LoadModule rewrite_module lib/httpd/modules/mod_rewrite.so
+
+# Restart Apache
+brew services restart httpd
 ```
 
-### 6. Start the Server
+### Step 9: Open the Site
+
+Go to **http://localhost:8080** in your browser.
+
+---
+
+## Quick Reference (After First Setup)
+
+If you've already installed everything and just need to restart:
+
 ```bash
-# Apache (macOS Homebrew)
+# Start services
+brew services start mysql
 brew services start httpd
 
-# OR use PHP's built-in server (development only)
-php -S localhost:8080
-```
-
-### 7. Visit the Site
-Open `http://localhost:8080` in your browser.
-
-### 8. Admin Login
-- **URL:** `http://localhost:8080/wp-admin`
-- **Username:** `admin`
-- **Password:** *(change after first login via database or WP-CLI)*
-```bash
-wp user update 1 --user_pass=newpassword
+# Stop services
+brew services stop mysql
+brew services stop httpd
 ```
 
 ---
 
-## Project Structure
+## Admin Login
 
-```
-triple-t-shop/
-├── wp-content/
-│   ├── themes/twentytwentyfive/    # Customized Twenty Twenty-Five theme
-│   │   ├── functions.php           # All custom PHP code
-│   │   ├── style.css               # Custom CSS (~800 lines)
-│   │   ├── templates/              # Custom block templates
-│   │   ├── patterns/               # Header/footer patterns
-│   │   ├── woocommerce/            # WooCommerce template overrides
-│   │   └── assets/js/              # JavaScript files
-│   ├── mu-plugins/                 # Must-use plugins
-│   │   └── smtp.php                # Gmail SMTP configuration
-│   └── plugins/woocommerce/        # WooCommerce plugin
-├── setup.sh                        # Setup script
-├── wp-config.example.php           # Config template
-└── triple-t-shop-dump.sql          # Database dump
+- **URL:** http://localhost:8080/wp-admin
+- **Username:** `admin`
+- **Password:** Reset it with:
+
+```bash
+wp user update 1 --user_pass=yournewpassword
 ```
 
 ---
@@ -105,75 +120,30 @@ triple-t-shop/
 
 | Feature | Description |
 |---------|-------------|
-| **16 Products** | Sahur-themed essentials with creative names (Platriple T, Tungbler, Sahur Box) |
+| **16 Products** | Sahur-themed essentials (Platriple T, Tungbler, Sahur Box, etc.) |
 | **2FA Login** | Email OTP verification via Gmail SMTP |
-| **AI Chatbot** | Groq-powered chatbot for product questions and cart operations |
+| **AI Chatbot** | Floating chat button — ask about products, add to cart |
 | **Product Search** | AJAX autocomplete with partial matching |
-| **Product Categories** | 7 categories (Kitchen & Dining, Drinkware, Food Storage, etc.) |
+| **7 Categories** | Kitchen & Dining, Drinkware, Food Storage, Apparel, etc. |
 | **Coupons** | SAHUR10 (10%), TRIPLET20 (20%), FREESHIP |
-| **Payment Methods** | Direct bank transfer, check payments, cash on delivery |
-| **Shipping** | Free shipping (USA zone) |
-| **Checkout Gate** | Guests redirected to login before checkout |
-| **Dashboard** | Custom flexbox sidebar layout |
-| **Homepage Carousel** | Blurred background image slider |
-| **Responsive** | Mobile-friendly design |
-
----
-
-## Optional Configuration
-
-### SMTP (Email)
-Edit `wp-content/mu-plugins/smtp.php`:
-```php
-$phpmailer->Username = 'your-email@gmail.com';
-$phpmailer->Password = 'your-app-password';
-```
-
-### AI Chatbot
-Get a free API key at [console.groq.com](https://console.groq.com/keys), then edit:
-```javascript
-// wp-content/themes/twentytwentyfive/assets/js/chatbot.js
-var GROQ_KEY = 'your-groq-api-key';
-```
-
-### Custom Domain
-Update all `http://localhost:8080` references in:
-- `wp-content/themes/twentytwentyfive/patterns/header.php`
-- `wp-content/themes/twentytwentyfive/patterns/footer.php`
-- `wp-content/themes/twentytwentyfive/templates/home.html`
-
----
-
-## Stopping the Server
-
-```bash
-# Apache
-brew services stop httpd
-
-# PHP built-in server
-# Press Ctrl+C in the terminal window
-```
+| **Payment Methods** | Bank transfer, check, cash on delivery |
+| **Free Shipping** | USA zone |
+| **Checkout Gate** | Guests must login to checkout |
+| **Dashboard** | Sidebar layout (orders, addresses, downloads) |
+| **Carousel** | Blurred background image slider on homepage |
 
 ---
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| **White screen** | Check `wp-config.php` DB credentials are correct |
-| **404 on pages** | Enable `mod_rewrite` and restart Apache |
-| **No emails sent** | Edit `smtp.php` with valid Gmail app password |
-| **Chatbot not working** | Add Groq API key to `chatbot.js` |
-| **Database import fails** | Ensure MySQL is running: `brew services start mysql` |
-| **Images missing** | WordPress uploads are at `wp-content/uploads/` — included in git |
-
----
-
-## Tech Stack
-
-- **CMS:** WordPress 6.7+
-- **E-commerce:** WooCommerce 10.7+
-- **AI:** Groq API (Llama 3.3 70B)
-- **Email:** Gmail SMTP
-- **Font:** Manrope (variable weight)
-- **Theme:** Twenty Twenty-Five (heavily customized)
+| Issue | Fix |
+|-------|-----|
+| **"command not found: brew"** | Homebrew didn't install. Go back to Step 1. |
+| **"command not found: mysql"** | Run `brew install mysql` |
+| **MySQL won't start** | Run `brew services restart mysql` |
+| **Apache won't start** | Run `brew services restart httpd` |
+| **White screen on site** | Check `wp-config.php` has correct DB credentials |
+| **Database import fails** | Make sure MySQL is running: `brew services start mysql` |
+| **404 on pages** | Enable mod_rewrite in Apache config (Step 8) |
+| **"Error establishing database connection"** | MySQL isn't running or DB credentials are wrong |
+| **Images broken** | Complete WordPress install — visit http://localhost:8080/wp-admin once |
