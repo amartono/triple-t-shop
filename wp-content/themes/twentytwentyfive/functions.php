@@ -159,6 +159,14 @@ if ( ! function_exists( 'twentytwentyfive_format_binding' ) ) :
 endif;
 
 if ( ! function_exists( 'twentytwentyfive_product_search_filter' ) ) :
+	/**
+	 * Enables partial-match product search by searching post_title with SQL LIKE.
+	 * Matches search terms anywhere in the product name (front, middle, back).
+	 *
+	 * @param string $sql   Existing search SQL.
+	 * @param WP_Query $query The current query object.
+	 * @return string Modified search SQL.
+	 */
 	function twentytwentyfive_product_search_filter( $sql, $query ) {
 		global $wpdb;
 		if ( ! is_admin() && ( $query->is_search() || ! empty( $_GET['ttt_search'] ) || ! empty( $_GET['s'] ) ) ) {
@@ -180,6 +188,12 @@ endif;
 add_filter( 'posts_search', 'twentytwentyfive_product_search_filter', 10, 2 );
 
 if ( ! function_exists( 'twentytwentyfive_product_query_search' ) ) :
+	/**
+	 * Sets the search query var from ttt_search URL parameter on the main query.
+	 * Used by the shop page search bar to filter products.
+	 *
+	 * @param WP_Query $query The main query object.
+	 */
 	function twentytwentyfive_product_query_search( $query ) {
 		if ( ! is_admin() && $query->is_main_query() && ! empty( $_GET['ttt_search'] ) ) {
 			$search = sanitize_text_field( $_GET['ttt_search'] );
@@ -190,6 +204,10 @@ endif;
 add_action( 'pre_get_posts', 'twentytwentyfive_product_query_search' );
 
 if ( ! function_exists( 'twentytwentyfive_enqueue_shop_search' ) ) :
+	/**
+	 * Enqueues the shop-search.js script on WooCommerce shop, category, and tag pages.
+	 * Provides AJAX autocomplete search functionality on the product archive.
+	 */
 	function twentytwentyfive_enqueue_shop_search() {
 		if ( is_shop() || is_product_category() || is_product_tag() ) {
 			wp_enqueue_script( 'twentytwentyfive-shop-search', get_template_directory_uri() . '/assets/js/shop-search.js', array(), '1.0', true );
@@ -200,11 +218,24 @@ add_action( 'wp_enqueue_scripts', 'twentytwentyfive_enqueue_shop_search' );
 
 // Chatbot JS
 add_action( 'wp_enqueue_scripts', function () {
+	/**
+	 * Enqueues the AI chatbot JavaScript (chatbot.js) on all frontend pages.
+	 * Creates a floating chat button (bottom-right) powered by Groq AI API.
+	 * Handles product questions, add-to-cart, and shop navigation.
+	 */
 	wp_enqueue_script( 'ttt-chatbot', get_template_directory_uri() . '/assets/js/chatbot.js', array(), '1.0', true );
 });
 
 // Custom shop template via shortcode
 add_shortcode( 'ttt_product_grid', function () {
+	/**
+	 * [ttt_product_grid] shortcode — Renders the custom product grid on the shop page.
+	 * Displays products in a 3-column responsive flex grid with images, titles,
+	 * prices, and Add to Cart buttons. Uses the main WordPress query for pagination.
+	 * Supports search filtering via the ttt_search URL parameter.
+	 *
+	 * @return string HTML output of the product grid.
+	 */
 	global $wp_query;
 	$out = '';
 
@@ -254,12 +285,26 @@ add_filter( 'body_class', function ( $classes ) {
 
 /* ========== 2FA Email OTP Login ========== */
 if ( ! function_exists( 'twentytwentyfive_otp_generate' ) ) :
+	/**
+	 * Generates a cryptographically secure 6-digit OTP code for 2FA login.
+	 * Uses random_int() for security and zero-pads to 6 digits.
+	 *
+	 * @return string 6-digit verification code.
+	 */
 	function twentytwentyfive_otp_generate() {
 		return str_pad( random_int( 0, 999999 ), 6, '0', STR_PAD_LEFT );
 	}
 endif;
 
 if ( ! function_exists( 'twentytwentyfive_otp_send' ) ) :
+	/**
+	 * Sends the OTP verification code to the user via wp_mail() (Gmail SMTP).
+	 * Called during the 2FA login flow after password verification.
+	 *
+	 * @param string $email User's email address.
+	 * @param string $code  6-digit OTP code.
+	 * @param WP_User $user The user object.
+	 */
 	function twentytwentyfive_otp_send( $email, $code, $user ) {
 		$site = get_bloginfo( 'name' );
 		$subject = "[$site] Your Verification Code: $code";
@@ -364,6 +409,11 @@ add_action( 'template_redirect', function () {
 
 // Redirect to login if checkout while not logged in
 add_action( 'template_redirect', function () {
+	/**
+	 * Redirects non-logged-in users from checkout to the login page.
+	 * Adds a redirect_to parameter so users return to checkout after login.
+	 * Enforces the "must login to checkout" policy.
+	 */
 	if ( is_checkout() && ! is_user_logged_in() ) {
 		wp_safe_redirect( add_query_arg( 'redirect_to', wc_get_checkout_url(), wc_get_page_permalink( 'myaccount' ) ) );
 		exit;
@@ -485,6 +535,14 @@ add_filter( 'render_block', function ( $content, $block ) {
 
 // Header nav position fix
 add_action('wp_head', function(){
+    /**
+	 * Dashboard layout CSS — Applied via wp_head when user is logged in on
+	 * the My Account page. Creates a flexbox sidebar layout with:
+	 * - 200px fixed nav sidebar pinned to the left edge (negative margin).
+	 * - Flexible content area with white card background and rounded corners.
+	 * - Hides the stray login form wrapper (u-columns#customer_login).
+	 * - Makes order table text smaller for better fit.
+	 */
     if (is_user_logged_in() && (is_page(9) || is_account_page())) {
         echo '<style>
 .woocommerce-account .woocommerce { max-width: 100% !important; transform: translateX(-200px); }
@@ -503,6 +561,11 @@ body.ttt-logged-in.page-id-9 .u-columns#customer_login { display: none !importan
 
 // Header nav position lock
 add_action('wp_head', function(){
+    /**
+	 * Header navigation position lock — Positions the main nav (Shop/Cart/Account)
+	 * absolutely at right:80px within the header row. This prevents the nav from
+	 * shifting between pages when the mini-cart or other header elements change size.
+	 */
     echo '<style>
 header .wp-block-group.alignwide { position: relative !important; }
 header .wp-block-navigation { position: absolute !important; right: 80px !important; top: 50% !important; transform: translateY(-50%) !important; }
