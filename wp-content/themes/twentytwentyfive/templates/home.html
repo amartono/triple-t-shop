@@ -1,0 +1,227 @@
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!-- wp:group {"tagName":"main","layout":{"type":"constrained"}} -->
+<main class="wp-block-group">
+
+<!-- wp:html -->
+<style>
+.hero-carousel {
+    position: relative;
+    overflow: hidden;
+    margin-top: 0;
+}
+.hero-carousel .caro-img {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(6px);
+    transform: scale(1.1);
+    opacity: 0;
+    transition: opacity 2.5s ease-in-out;
+}
+.hero-carousel .caro-img.active { opacity: 1; }
+.hero-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1;
+}
+.hero-carousel .wp-block-group,
+.hero-carousel .wp-block-spacer,
+.hero-carousel .wp-block-heading,
+.hero-carousel .wp-block-paragraph,
+.hero-carousel .wp-block-buttons,
+.hero-carousel .wp-block-image { position: relative; z-index: 2; }
+.hero-carousel h1 { text-shadow: 0 4px 20px rgba(0,0,0,0.7), 0 2px 8px rgba(0,0,0,0.5); }
+.hero-carousel p { text-shadow: 0 2px 10px rgba(0,0,0,0.6); font-weight: 500 !important; }
+</style>
+<!-- /wp:html -->
+
+<!-- wp:group {"align":"full","style":{"color":{"gradient":"linear-gradient(180deg, #2a0700 0%, #5a1a05 40%, #3d0c02 100%)"},"spacing":{"padding":{"top":"var:preset|spacing|80","bottom":"var:preset|spacing|80","left":"var:preset|spacing|50","right":"var:preset|spacing|50"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group alignfull has-background hero-carousel" style="background:linear-gradient(180deg, #2a0700 0%, #5a1a05 40%, #3d0c02 100%);padding-top:var(--wp--preset--spacing--80);padding-bottom:var(--wp--preset--spacing--80);padding-left:var(--wp--preset--spacing--50);padding-right:var(--wp--preset--spacing--50)">
+
+<div class="caro-img active" style="background-image:url('/wp-content/uploads/2026/05/Caro1.png')"></div>
+<div class="caro-img" style="background-image:url('/wp-content/uploads/2026/05/Caro2.png')"></div>
+<div class="caro-img" style="background-image:url('/wp-content/uploads/2026/05/Caro3.png')"></div>
+<div class="caro-img" style="background-image:url('/wp-content/uploads/2026/05/Caro4.png')"></div>
+
+<div class="hero-overlay"></div>
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:group {"style":{"spacing":{"blockGap":"var:preset|spacing|20"}},"layout":{"type":"constrained","contentSize":"800px"}} -->
+<div class="wp-block-group">
+
+<!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"0.875rem","letterSpacing":"6px","textTransform":"uppercase","fontStyle":"normal","fontWeight":"500"},"color":{"text":"#e8c860"}},"fontFamily":"manrope"} -->
+<p class="has-text-align-center has-manrope-font-family has-text-color" style="color:#e8c860;font-size:0.875rem;font-style:normal;font-weight:500;letter-spacing:6px;text-transform:uppercase">Welcome to</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {"id":77,"sizeSlug":"large","align":"center","style":{"spacing":{"margin":{"top":"0","bottom":"0"}}},"className":"is-style-default"} -->
+<figure class="wp-block-image aligncenter size-large is-style-default"><img src="/wp-content/uploads/2026/05/TripleTLogo.png" alt="Triple T Shop" style="max-width:800px;width:85%;height:auto"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:group {"style":{"spacing":{"blockGap":"0"}},"layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"center"}} -->
+<div class="wp-block-group">
+<!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"1.25rem","fontStyle":"normal","fontWeight":"300"},"color":{"text":"#d4983c"}},"fontFamily":"manrope"} -->
+<p class="has-text-align-center has-manrope-font-family has-text-color" style="color:#d4983c;font-size:1.25rem;font-style:normal;font-weight:300">Your Sahur Essentials</p>
+<!-- /wp:paragraph -->
+</div>
+<!-- /wp:group -->
+
+<!-- wp:spacer {"height":"30px"} -->
+<div style="height:30px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
+<div class="wp-block-buttons">
+<!-- wp:button {"textColor":"base","style":{"border":{"radius":"50px"},"color":{"background":"#c6742e"},"spacing":{"padding":{"left":"3rem","right":"3rem","top":"1.1rem","bottom":"1.1rem"}},"typography":{"fontSize":"1.125rem","fontWeight":"600","textTransform":"none","letterSpacing":"-0.5px"}}} -->
+<div class="wp-block-button"><a class="wp-block-button__link has-base-color has-text-color has-background wp-element-button" href="http://localhost:8080/?post_type=product" style="border-radius:50px;background-color:#c6742e;padding-top:1.1rem;padding-right:3rem;padding-bottom:1.1rem;padding-left:3rem;font-size:1.125rem;font-weight:600;letter-spacing:-0.5px;text-transform:none">Explore the Shop</a></div>
+<!-- /wp:button -->
+</div>
+<!-- /wp:buttons -->
+
+</div>
+<!-- /wp:group -->
+
+<!-- wp:spacer {"height":"60px"} -->
+<div style="height:60px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:group {"style":{"spacing":{"blockGap":"48px"}},"layout":{"type":"flex","flexWrap":"wrap","justifyContent":"center"}} -->
+<div class="wp-block-group">
+
+<!-- wp:group {"style":{"spacing":{"blockGap":"8px"},"color":{"background":"#5a1a0533"}},"layout":{"type":"constrained","contentSize":"180px"}} -->
+<div class="wp-block-group has-background" style="background-color:#5a1a0533;padding:24px;border-radius:16px;text-align:center">
+<img src="/wp-content/uploads/2026/05/TripleQuality.png" alt="Triple Quality" style="width:50px;height:50px;display:block;margin:0 auto 8px auto">
+<!-- wp:paragraph {"align":"center","style":{"color":{"text":"#fff5e6"},"typography":{"fontSize":"0.8rem","textTransform":"uppercase","letterSpacing":"2px"}}} -->
+<p class="has-text-align-center has-text-color" style="color:#fff5e6;font-size:0.8rem;letter-spacing:2px;text-transform:uppercase">Triple Quality</p>
+<!-- /wp:paragraph -->
+</div>
+<!-- /wp:group -->
+
+<!-- wp:group {"style":{"spacing":{"blockGap":"8px"},"color":{"background":"#5a1a0533"}},"layout":{"type":"constrained","contentSize":"180px"}} -->
+<div class="wp-block-group has-background" style="background-color:#5a1a0533;padding:24px;border-radius:16px;text-align:center">
+<img src="/wp-content/uploads/2026/05/SahurReady.png" alt="Sahur Ready" style="width:50px;height:50px;display:block;margin:0 auto 8px auto">
+<!-- wp:paragraph {"align":"center","style":{"color":{"text":"#fff5e6"},"typography":{"fontSize":"0.8rem","textTransform":"uppercase","letterSpacing":"2px"}}} -->
+<p class="has-text-align-center has-text-color" style="color:#fff5e6;font-size:0.8rem;letter-spacing:2px;text-transform:uppercase">Sahur Ready</p>
+<!-- /wp:paragraph -->
+</div>
+<!-- /wp:group -->
+
+<!-- wp:group {"style":{"spacing":{"blockGap":"8px"},"color":{"background":"#5a1a0533"}},"layout":{"type":"constrained","contentSize":"180px"}} -->
+<div class="wp-block-group has-background" style="background-color:#5a1a0533;padding:24px;border-radius:16px;text-align:center">
+<img src="/wp-content/uploads/2026/05/FastDelivery.png" alt="Fast Delivery" style="width:50px;height:50px;display:block;margin:0 auto 8px auto">
+<!-- wp:paragraph {"align":"center","style":{"color":{"text":"#fff5e6"},"typography":{"fontSize":"0.8rem","textTransform":"uppercase","letterSpacing":"2px"}}} -->
+<p class="has-text-align-center has-text-color" style="color:#fff5e6;font-size:0.8rem;letter-spacing:2px;text-transform:uppercase">Fast Delivery</p>
+<!-- /wp:paragraph -->
+</div>
+<!-- /wp:group -->
+
+</div>
+<!-- /wp:group -->
+
+<!-- wp:spacer {"height":"80px"} -->
+<div style="height:80px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+</div>
+<!-- /wp:group -->
+
+<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"var:preset|spacing|70","bottom":"var:preset|spacing|50","left":"var:preset|spacing|50","right":"var:preset|spacing|50"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group alignfull" style="padding-top:var(--wp--preset--spacing--70);padding-bottom:var(--wp--preset--spacing--50);padding-left:var(--wp--preset--spacing--50);padding-right:var(--wp--preset--spacing--50)">
+
+<!-- wp:heading {"textAlign":"center","level":2,"style":{"typography":{"fontSize":"clamp(2rem, 4vw, 3.5rem)","fontStyle":"normal","fontWeight":"700","lineHeight":"1.15","letterSpacing":"-1px"},"color":{"text":"#3d0c02"}},"fontFamily":"manrope"} -->
+<h2 class="wp-block-heading has-text-align-center has-manrope-font-family has-text-color" style="color:#3d0c02;font-size:clamp(2rem, 4vw, 3.5rem);font-style:normal;font-weight:700;letter-spacing:-1px;line-height:1.15">Featured Sahur Picks</h2>
+<!-- /wp:heading -->
+
+<!-- wp:spacer {"height":"40px"} -->
+<div style="height:40px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:columns {"align":"wide"} -->
+<div class="wp-block-columns alignwide">
+
+<!-- wp:column {"style":{"spacing":{"blockGap":"12px"}}} -->
+<div class="wp-block-column">
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"custom","style":{"border":{"radius":"16px"}}} -->
+<figure class="wp-block-image size-large has-custom-border"><a href="http://localhost:8080/?post_type=product"><img src="/wp-content/uploads/2026/05/TungPlate.png" alt="Tung Tung Plate" style="border-radius:16px"/></a></figure>
+<!-- /wp:image -->
+
+<!-- wp:heading {"level":3,"style":{"typography":{"fontSize":"1.25rem","fontStyle":"normal","fontWeight":"600"},"color":{"text":"#5a1a05"}}} -->
+<h3 class="wp-block-heading has-text-color" style="color:#5a1a05;font-size:1.25rem;font-style:normal;font-weight:600">Tung Tung Plate</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"style":{"color":{"text":"#7a4a2a"},"typography":{"fontSize":"0.9rem"}}} -->
+<p class="has-text-color" style="color:#7a4a2a;font-size:0.9rem">Sturdy sahur essential</p>
+<!-- /wp:paragraph -->
+
+</div>
+<!-- /wp:column -->
+
+<!-- wp:column {"style":{"spacing":{"blockGap":"12px"}}} -->
+<div class="wp-block-column">
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"custom","style":{"border":{"radius":"16px"}}} -->
+<figure class="wp-block-image size-large has-custom-border"><a href="http://localhost:8080/?post_type=product"><img src="/wp-content/uploads/2026/05/TungMug.png" alt="Tung Tung Mug" style="border-radius:16px"/></a></figure>
+<!-- /wp:image -->
+
+<!-- wp:heading {"level":3,"style":{"typography":{"fontSize":"1.25rem","fontStyle":"normal","fontWeight":"600"},"color":{"text":"#5a1a05"}}} -->
+<h3 class="wp-block-heading has-text-color" style="color:#5a1a05;font-size:1.25rem;font-style:normal;font-weight:600">Tung Tung Mug</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"style":{"color":{"text":"#7a4a2a"},"typography":{"fontSize":"0.9rem"}}} -->
+<p class="has-text-color" style="color:#7a4a2a;font-size:0.9rem">Thick-walled sahur mug</p>
+<!-- /wp:paragraph -->
+
+</div>
+<!-- /wp:column -->
+
+<!-- wp:column {"style":{"spacing":{"blockGap":"12px"}}} -->
+<div class="wp-block-column">
+
+<!-- wp:image {"sizeSlug":"large","linkDestination":"custom","style":{"border":{"radius":"16px"}}} -->
+<figure class="wp-block-image size-large has-custom-border"><a href="http://localhost:8080/?post_type=product"><img src="/wp-content/uploads/2026/05/Tungbler.png" alt="Tungbler" style="border-radius:16px"/></a></figure>
+<!-- /wp:image -->
+
+<!-- wp:heading {"level":3,"style":{"typography":{"fontSize":"1.25rem","fontStyle":"normal","fontWeight":"600"},"color":{"text":"#5a1a05"}}} -->
+<h3 class="wp-block-heading has-text-color" style="color:#5a1a05;font-size:1.25rem;font-style:normal;font-weight:600">Tungbler</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph {"style":{"color":{"text":"#7a4a2a"},"typography":{"fontSize":"0.9rem"}}} -->
+<p class="has-text-color" style="color:#7a4a2a;font-size:0.9rem">500ml sahur hydration</p>
+<!-- /wp:paragraph -->
+
+</div>
+<!-- /wp:column -->
+
+</div>
+<!-- /wp:columns -->
+
+</div>
+<!-- /wp:group -->
+
+</main>
+<!-- /wp:group -->
+
+<!-- wp:html -->
+<script>
+(function(){
+    var imgs = document.querySelectorAll('.hero-carousel .caro-img');
+    if (imgs.length < 2) return;
+    var current = 0;
+    var delay = 7000;
+    function next(){
+        imgs[current].classList.remove('active');
+        current = (current + 1) % imgs.length;
+        imgs[current].classList.add('active');
+    }
+    setInterval(next, delay);
+})();
+</script>
+<!-- /wp:html -->
+
+<!-- wp:template-part {"slug":"footer"} /-->

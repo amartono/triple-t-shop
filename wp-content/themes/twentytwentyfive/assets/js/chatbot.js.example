@@ -1,0 +1,4 @@
+// Copy this file to chatbot.js and add your Groq API key
+// Get a free key at https://console.groq.com
+var GROQ_KEY = 'YOUR_GROQ_API_KEY';
+// ... rest of chatbot code is in the actual chatbot.js file

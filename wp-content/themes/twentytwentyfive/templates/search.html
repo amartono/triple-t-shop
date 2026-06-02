@@ -1,0 +1,44 @@
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!-- wp:group {"tagName":"main","style":{"spacing":{"margin":{"top":"var:preset|spacing|60"}}},"layout":{"type":"constrained"}} -->
+<main class="wp-block-group" style="margin-top:var(--wp--preset--spacing--60)">
+	<!-- wp:query-title {"type":"search","style":{"typography":{"fontSize":"clamp(2rem, 4vw, 3.5rem)","fontWeight":"700"},"color":{"text":"#3d0c02"}}} /-->
+
+	<!-- wp:spacer {"height":"24px"} -->
+	<div style="height:24px" aria-hidden="true" class="wp-block-spacer"></div>
+	<!-- /wp:spacer -->
+
+	<!-- wp:html -->
+	<div class="ttt-product-search" style="max-width:520px;margin:0 auto 40px auto">
+		<form role="search" method="get" action="/" style="display:flex;gap:0">
+			<input type="hidden" name="post_type" value="product">
+			<input type="search" name="s" placeholder="Search products..." autocomplete="off" style="flex:1;padding:14px 20px;border:2px solid #ddd;border-right:none;border-radius:50px 0 0 50px;font-size:1rem;font-family:Manrope,sans-serif;outline:none;transition:border-color .3s">
+			<button type="submit" style="padding:14px 24px;background:#C6742E;color:#fff;border:none;border-radius:0 50px 50px 0;cursor:pointer;font-size:1rem;font-family:Manrope,sans-serif;font-weight:600;transition:background .3s">Search</button>
+		</form>
+	</div>
+	<!-- /wp:html -->
+
+<!-- wp:query {"queryId":1,"query":{"perPage":12,"pages":0,"offset":0,"postType":"product","order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true,"taxQuery":null,"parents":[]},"tagName":"div","displayLayout":{"type":"flex","columns":3},"namespace":"woocommerce/product-collection"} -->
+<div class="wp-block-query">
+<!-- wp:woocommerce/product-template -->
+<!-- wp:woocommerce/product-image {"imageSizing":"full","isDescendentOfQueryLoop":true,"style":{"border":{"radius":"16px"}}} /-->
+<!-- wp:post-title {"textAlign":"center","level":2,"isLink":true,"style":{"typography":{"fontSize":"1rem","fontWeight":"600"},"color":{"text":"#3d0c02"}}} /-->
+<!-- wp:woocommerce/product-price {"textAlign":"center","isDescendentOfQueryLoop":true,"style":{"typography":{"fontSize":"0.95rem","fontWeight":"700"},"color":{"text":"#C6742E"}}} /-->
+<!-- wp:woocommerce/product-button {"textAlign":"center","isDescendentOfQueryLoop":true,"style":{"border":{"radius":"50px"},"color":{"background":"#C6742E","text":"#fff"},"typography":{"fontSize":"0.85rem"}}} /-->
+<!-- /wp:woocommerce/product-template -->
+	<!-- wp:query-pagination -->
+	<!-- wp:query-pagination-previous /-->
+	<!-- wp:query-pagination-numbers /-->
+	<!-- wp:query-pagination-next /-->
+	<!-- /wp:query-pagination -->
+	<!-- wp:query-no-results -->
+	<!-- wp:paragraph {"align":"center","style":{"color":{"text":"#3d0c02"}}} -->
+	<p class="has-text-align-center" style="color:#3d0c02">No products found. Try a different search.</p>
+	<!-- /wp:paragraph -->
+	<!-- /wp:query-no-results -->
+	</div>
+	<!-- /wp:query -->
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer"} /-->

@@ -1,0 +1,32 @@
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"12px","bottom":"30px","left":"8px","right":"8px"}},"layout":{"type":"constrained","contentSize":"100%"}} -->
+<main class="wp-block-group" style="padding:12px 8px 30px 8px">
+
+<!-- wp:heading {"textAlign":"center","level":1,"style":{"typography":{"fontSize":"clamp(1.5rem,3vw,2.5rem)","fontWeight":"700","lineHeight":"1.2"},"color":{"text":"#3d0c02"}}} -->
+<h1 class="wp-block-heading has-text-align-center has-text-color" style="color:#3d0c02;font-size:clamp(1.5rem,3vw,2.5rem);font-weight:700;line-height:1.2">Our Products</h1>
+<!-- /wp:heading -->
+
+<!-- wp:spacer {"height":"12px"} -->
+<div style="height:12px" aria-hidden="true" class="wp-block-spacer"></div>
+<!-- /wp:spacer -->
+
+<!-- wp:html -->
+<div class="ttt-product-search" style="max-width:520px;margin:0 auto 16px auto">
+	<form role="search" method="get" action="/" onsubmit="this.querySelector('#ttt-search-input-hidden').value=this.querySelector('#ttt-search-input').value" style="display:flex;gap:0">
+		<input type="hidden" name="post_type" value="product">
+		<input type="hidden" name="ttt_search" id="ttt-search-input-hidden" value="">
+		<input type="search" id="ttt-search-input" name="q" placeholder="Search products..." autocomplete="off" style="flex:1;padding:12px 18px;border:2px solid #ddd;border-right:none;border-radius:50px 0 0 50px;font-size:1rem;font-family:Manrope,sans-serif;outline:none;transition:border-color .3s">
+		<button type="submit" style="padding:12px 22px;background:#C6742E;color:#fff;border:none;border-radius:0 50px 50px 0;cursor:pointer;font-size:1rem;font-family:Manrope,sans-serif;font-weight:600;transition:background .3s">Search</button>
+	</form>
+</div>
+<!-- /wp:html -->
+
+<!-- wp:shortcode -->
+[ttt_product_grid]
+<!-- /wp:shortcode -->
+
+</main>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"footer"} /-->

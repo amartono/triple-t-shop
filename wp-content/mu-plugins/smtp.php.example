@@ -1,0 +1,15 @@
+<?php
+// Triple T Shop SMTP via Gmail
+// Copy this file to smtp.php and fill in your credentials
+add_filter( 'wp_mail_from', function () { return 'YOUR_EMAIL@gmail.com'; } );
+add_filter( 'wp_mail_from_name', function () { return 'Triple T Shop'; } );
+
+add_action( 'phpmailer_init', function ( $phpmailer ) {
+    $phpmailer->isSMTP();
+    $phpmailer->Host       = 'smtp.gmail.com';
+    $phpmailer->Port       = 587;
+    $phpmailer->SMTPAuth   = true;
+    $phpmailer->Username   = 'YOUR_EMAIL@gmail.com';
+    $phpmailer->Password   = 'YOUR_APP_PASSWORD';
+    $phpmailer->SMTPSecure = 'tls';
+});

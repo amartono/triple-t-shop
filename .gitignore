@@ -1,0 +1,26 @@
+# WordPress config with DB credentials
+wp-config.php
+
+# Sensitive API keys and passwords
+wp-content/themes/twentytwentyfive/assets/js/chatbot.js
+wp-content/mu-plugins/smtp.php
+
+# WordPress core (optional - keep these tracked to clone full site)
+# wp-admin/
+# wp-includes/
+
+# Uploads (too large, not code)
+wp-content/uploads/
+
+# Caches and temp
+wp-content/cache/
+wp-content/upgrade/
+wp-content/updraft/
+
+# Logs
+*.log
+debug.log
+
+# OS files
+.DS_Store
+Thumbs.db
