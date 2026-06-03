@@ -285,7 +285,29 @@ footer.wp-block-template-part .wp-block-group {
 	border-radius: 16px;
 }
 
-/* Global button polish */
+/* Add to cart hover effects */
+.wc-block-grid__product-add-to-cart .wp-block-button__link,
+.product-card a[href*="add-to-cart"],
+a.add_to_cart_button, a.ajax_add_to_cart {
+	transition: all 0.3s ease !important;
+}
+.wc-block-grid__product-add-to-cart .wp-block-button__link:hover,
+.product-card a[href*="add-to-cart"]:hover,
+a.add_to_cart_button:hover, a.ajax_add_to_cart:hover {
+	transform: translateY(-3px) !important;
+	box-shadow: 0 8px 20px rgba(198,116,46,0.4) !important;
+	background: #a8601a !important;
+}
+
+/* Product image hover */
+.product-card a:first-child img {
+	transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+	border-radius: 16px;
+}
+.product-card a:first-child:hover img {
+	transform: translateY(-4px) !important;
+	box-shadow: 0 12px 30px rgba(61,12,2,0.15) !important;
+}
 .wp-element-button, .wp-block-button__link {
 	font-family: var(--wp--preset--font-family--manrope);
 	letter-spacing: -0.5px;
@@ -297,13 +319,11 @@ footer.wp-block-template-part .wp-block-group {
 	letter-spacing: -1px !important;
 }
 
-/* WC notices */
-.woocommerce-info, .woocommerce-message {
-	border-top-color: #C6742E !important;
-}
-
-.woocommerce-info::before, .woocommerce-message::before {
-	color: #C6742E !important;
+/* Hide all WC notices on cart page */
+.woocommerce-cart .woocommerce-message,
+.woocommerce-cart .woocommerce-info,
+.woocommerce-cart .woocommerce-error {
+	display: none !important;
 }
 
 /* Product search bar */

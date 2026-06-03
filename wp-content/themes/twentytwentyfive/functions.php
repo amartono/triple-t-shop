@@ -275,7 +275,13 @@ add_action( 'pre_get_posts', function ( $query ) {
 	}
 });
 
-// Add class to body when logged in for proper account layout
+// Strip add-to-cart from URL after redirect to prevent re-adding on refresh
+add_action( 'template_redirect', function () {
+	if ( is_cart() && ! empty( $_GET['add-to-cart'] ) ) {
+		wp_safe_redirect( remove_query_arg( 'add-to-cart' ) );
+		exit;
+	}
+}, 5 );
 add_filter( 'body_class', function ( $classes ) {
 	if ( is_user_logged_in() ) {
 		$classes[] = 'ttt-logged-in';
@@ -569,6 +575,13 @@ add_filter( 'the_content', function( $content ) {
     }
     return $content;
 }, 99 );
+
+// Hide WooCommerce notices on cart page
+add_action('wp_head', function(){
+    if (is_cart()) {
+        echo '<style>body.woocommerce-cart .woocommerce-message,body.woocommerce-cart .woocommerce-info,body.woocommerce-cart .woocommerce-error,body.woocommerce-cart .woocommerce-notices-wrapper{display:none!important}</style>';
+    }
+});
 
 // Header nav position lock
 add_action('wp_head', function(){
