@@ -9,8 +9,8 @@ wp-content/mu-plugins/smtp.php
 # wp-admin/
 # wp-includes/
 
-# Uploads (too large, not code)
-wp-content/uploads/
+# Uploads — included for product images
+# wp-content/uploads/
 
 # Caches and temp
 wp-content/cache/
