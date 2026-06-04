@@ -25,7 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $msg = 'Product updated!';
     } elseif ($title) {
-        $db->query("INSERT INTO wp_posts (post_title,post_content,post_status,post_type,post_date,post_date_gmt) VALUES ('$title','$desc','publish','product',NOW(),UTC_TIMESTAMP())");
+        $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $_POST['title'] ?? ''));
+        $slug = $db->real_escape_string($slug);
+        $db->query("INSERT INTO wp_posts (post_title,post_content,post_excerpt,to_ping,pinged,post_content_filtered,post_name,post_status,post_type,post_date,post_date_gmt) VALUES ('$title','$desc','','','','','$slug','publish','product',NOW(),UTC_TIMESTAMP())");
         $new = $db->insert_id;
         update_meta($db, $new, '_price', $price);
         update_meta($db, $new, '_regular_price', $price);

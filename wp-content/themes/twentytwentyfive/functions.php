@@ -243,7 +243,7 @@ add_shortcode( 'ttt_product_grid', function () {
 		$out .= '<div class="ttt-products" style="display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;">';
 		while ($wp_query->have_posts()) { $wp_query->the_post();
 			$p = wc_get_product(get_the_ID());
-			$img = get_the_post_thumbnail_url(get_the_ID(), 'full');
+			$img = get_the_post_thumbnail_url(get_the_ID(), 'full') ?: '/wp-content/uploads/placeholder-product.png';
 			$cart_url = esc_url( add_query_arg('add-to-cart', get_the_ID(), home_url('/?page_id=7')) );
 			$permalink = esc_url( get_permalink() );
 			$title = esc_html( get_the_title() );
