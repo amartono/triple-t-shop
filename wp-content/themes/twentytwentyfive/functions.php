@@ -327,6 +327,9 @@ if ( ! function_exists( 'twentytwentyfive_otp_send' ) ) :
 		$message .= "This code expires in 15 minutes. If you did not request this, please ignore this email.\n\n";
 		$message .= "— $site";
 		wp_mail( $email, $subject, $message );
+		if ( function_exists( 'ttt_log' ) ) {
+			ttt_log( 'otp_sent', [ 'user_id' => $user->ID, 'email' => $email ] );
+		}
 	}
 endif;
 
@@ -403,11 +406,18 @@ add_action( 'template_redirect', function () {
 				wp_set_current_user( $user_id );
 				wp_set_auth_cookie( $user_id, true );
 
+				if ( function_exists( 'ttt_log' ) ) {
+					ttt_log( 'otp_verified', [ 'user_id' => $user_id ] );
+				}
+
 				$redirect = ! empty( $_GET['redirect_to'] ) ? $_GET['redirect_to'] : home_url();
 				wp_safe_redirect( $redirect );
 				exit;
 			} else {
 				// Invalid code — show error
+				if ( function_exists( 'ttt_log' ) ) {
+					ttt_log( 'otp_failed', [ 'user_id' => $user_id ], 'WARN' );
+				}
 				add_action( 'wp_footer', function () {
 					echo '<script>document.getElementById("ttt-otp-error").style.display="block";</script>';
 				});
@@ -608,3 +618,48 @@ header .wp-block-navigation { position: absolute !important; right: 80px !import
 .home .wp-site-blocks > * + * { margin-block-start: 0 !important; }
 </style>';
 });
+
+/* ========== Audit Logging Hooks ========== */
+
+// Log user registration
+add_action( 'user_register', function ( $user_id ) {
+    if ( function_exists( 'ttt_log' ) ) {
+        $user = get_userdata( $user_id );
+        ttt_log( 'user_registered', [ 'user_id' => $user_id, 'email' => $user->user_email ] );
+    }
+});
+
+// Log WooCommerce order placed
+add_action( 'woocommerce_checkout_order_processed', function ( $order_id ) {
+    if ( function_exists( 'ttt_log' ) ) {
+        $order = wc_get_order( $order_id );
+        ttt_log( 'order_placed', [
+            'order_id'   => $order_id,
+            'total'      => $order->get_total(),
+            'currency'   => $order->get_currency(),
+            'user_id'    => $order->get_user_id(),
+            'item_count' => $order->get_item_count(),
+        ]);
+    }
+}, 10, 1 );
+
+// Log login attempts (successful password before OTP)
+add_action( 'wp_login', function ( $user_login, $user ) {
+    if ( function_exists( 'ttt_log' ) ) {
+        ttt_log( 'user_login', [ 'user_id' => $user->ID, 'email' => $user->user_email ] );
+    }
+}, 10, 2 );
+
+// Log failed login attempts
+add_action( 'wp_login_failed', function ( $username ) {
+    if ( function_exists( 'ttt_log' ) ) {
+        ttt_log( 'login_failed', [ 'username' => $username ], 'WARN' );
+    }
+});
+
+// Log cart additions from frontend
+add_action( 'woocommerce_add_to_cart', function ( $cart_item_key, $product_id ) {
+    if ( function_exists( 'ttt_log' ) ) {
+        ttt_log( 'add_to_cart', [ 'product_id' => $product_id, 'cart_key' => $cart_item_key ] );
+    }
+}, 10, 2 );

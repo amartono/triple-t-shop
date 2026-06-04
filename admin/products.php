@@ -4,6 +4,35 @@ require_admin();
 
 $msg = '';
 
+function handle_image_upload($db, $file, $product_id) {
+    if (empty($file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) return false;
+
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, ['jpg','jpeg','png','webp','gif'])) return false;
+
+    $upload_dir = '/opt/homebrew/var/www/wp-content/uploads/' . date('Y') . '/' . date('m');
+    if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+
+    $filename = 'product-' . $product_id . '-' . time() . '.' . $ext;
+    $dest = $upload_dir . '/' . $filename;
+
+    if (!move_uploaded_file($file['tmp_name'], $dest)) return false;
+
+    $rel_path = date('Y') . '/' . date('m') . '/' . $filename;
+    $mime = $file['type'];
+    $title = $db->real_escape_string($file['name']);
+
+    $db->query("INSERT INTO wp_posts (post_title,post_content,post_excerpt,to_ping,pinged,post_content_filtered,post_name,post_status,post_type,post_mime_type,post_date,post_date_gmt) VALUES ('$title','','','','','','attachment-{$product_id}','inherit','attachment','$mime',NOW(),UTC_TIMESTAMP())");
+    $attach_id = $db->insert_id;
+
+    update_meta($db, $attach_id, '_wp_attached_file', $rel_path);
+    update_meta($db, $product_id, '_thumbnail_id', $attach_id);
+
+    ttt_log('product_image_uploaded', ['product_id' => $product_id, 'attachment_id' => $attach_id, 'file' => $rel_path]);
+
+    return $rel_path;
+}
+
 // Handle CRUD
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = intval($_POST['product_id'] ?? 0);
@@ -23,7 +52,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             update_meta($db, $id, '_stock_status', $stock_qty > 0 ? 'instock' : 'outofstock');
         }
 
+        if (!empty($_FILES['product_image']['tmp_name'])) {
+            handle_image_upload($db, $_FILES['product_image'], $id);
+        }
+
         $msg = 'Product updated!';
+        ttt_log('product_updated', ['id' => $id, 'title' => $_POST['title'] ?? '', 'price' => $price, 'stock_qty' => $stock_qty]);
     } elseif ($title) {
         $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $_POST['title'] ?? ''));
         $slug = $db->real_escape_string($slug);
@@ -44,19 +78,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $msg = 'Product created! ID: ' . $new;
+        ttt_log('product_created', ['id' => $new, 'title' => $_POST['title'] ?? '', 'price' => $price, 'stock_qty' => $stock_qty]);
+
+        if (!empty($_FILES['product_image']['tmp_name'])) {
+            handle_image_upload($db, $_FILES['product_image'], $new);
+        }
     }
 }
 
 // Handle delete
 if (isset($_GET['delete'])) {
-    $db->query("UPDATE wp_posts SET post_status='trash' WHERE ID=".intval($_GET['delete']));
+    $del_id = intval($_GET['delete']);
+    $db->query("UPDATE wp_posts SET post_status='trash' WHERE ID=" . $del_id);
+    ttt_log('product_deleted', ['id' => $del_id]);
     $msg = 'Product deleted.';
 }
 
 // Handle toggle
 if (isset($_GET['toggle'])) {
-    $c = $db->query("SELECT post_status FROM wp_posts WHERE ID=".intval($_GET['toggle']))->fetch_column();
-    $db->query("UPDATE wp_posts SET post_status='".($c==='publish'?'draft':'publish')."' WHERE ID=".intval($_GET['toggle']));
+    $toggle_id = intval($_GET['toggle']);
+    $c = $db->query("SELECT post_status FROM wp_posts WHERE ID=" . $toggle_id)->fetch_column();
+    $new_status = ($c === 'publish' ? 'draft' : 'publish');
+    $db->query("UPDATE wp_posts SET post_status='$new_status' WHERE ID=" . $toggle_id);
+    ttt_log('product_toggled', ['id' => $toggle_id, 'from' => $c, 'to' => $new_status]);
 }
 
 // Handle quick stock update
@@ -67,6 +111,7 @@ if (isset($_GET['restock'])) {
     update_meta($db, $pid, '_stock', $qty);
     update_meta($db, $pid, '_stock_status', $qty > 0 ? 'instock' : 'outofstock');
     $msg = "Stock updated to $qty.";
+    ttt_log('product_restocked', ['id' => $pid, 'qty' => $qty]);
 }
 
 $products = $db->query("SELECT ID, post_title, post_status FROM wp_posts WHERE post_type='product' AND post_status!='trash' ORDER BY post_date DESC");
@@ -83,7 +128,7 @@ admin_header('Products');
 
 <button class="btn" onclick="document.getElementById('pf').classList.toggle('hidden')">+ New Product</button>
 
-<form method="post" id="pf" class="product-form <?= $edit ? '' : 'hidden' ?>">
+<form method="post" enctype="multipart/form-data" id="pf" class="product-form <?= $edit ? '' : 'hidden' ?>">
     <h3><?= $edit ? 'Edit Product #'.$edit['ID'] : 'New Product' ?></h3>
     <?php if ($edit): ?><input type="hidden" name="product_id" value="<?= $edit['ID'] ?>"><?php endif; ?>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
@@ -102,6 +147,19 @@ admin_header('Products');
         <div>
             <label>Stock Quantity (leave empty for unlimited)</label>
             <input type="number" name="stock_qty" min="0" value="<?= $edit ? (get_meta($db, $edit['ID'], '_manage_stock')==='yes' ? get_meta($db, $edit['ID'], '_stock') : '') : '' ?>" placeholder="e.g. 50">
+        </div>
+        <div>
+            <label>Product Image</label>
+            <input type="file" name="product_image" accept="image/*">
+            <?php if ($edit):
+                $thumb_id = get_meta($db, $edit['ID'], '_thumbnail_id');
+                if ($thumb_id):
+                    $thumb_file = get_meta($db, $thumb_id, '_wp_attached_file');
+                    if ($thumb_file): ?>
+                        <div style="margin-top:8px;"><img src="/wp-content/uploads/<?= htmlspecialchars($thumb_file) ?>" style="max-width:120px;border-radius:8px;"></div>
+                    <?php endif;
+                endif;
+            endif; ?>
         </div>
     </div>
     <button type="submit" class="btn"><?= $edit ? 'Update' : 'Create' ?></button>

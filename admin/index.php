@@ -23,9 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($hash && password_verify($password, $hash)) {
         $_SESSION['admin_logged_in'] = true;
+        ttt_log('admin_login', ['username' => $username, 'outcome' => 'success']);
         header('Location: /admin/dashboard.php');
         exit;
     }
+    ttt_log('admin_login', ['username' => $username, 'outcome' => 'failure'], 'WARN');
     $error = 'Invalid credentials';
 }
 ?>

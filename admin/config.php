@@ -8,6 +8,8 @@ define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'wordpress');
 
+require_once TRIPLET_ROOT . '/wp-content/mu-plugins/logger.php';
+
 $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
 function is_admin_logged_in() {
@@ -39,6 +41,7 @@ function admin_header($title) {
         <a href="/admin/products.php">Products</a>
         <a href="/admin/orders.php">Orders</a>
         <a href="/admin/reviews.php">Reviews</a>
+        <a href="/admin/audit.php">Audit Log</a>
         <a href="/admin/logout.php" class="logout">Logout</a>
     </nav>
     <div class="admin-content">
