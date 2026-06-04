@@ -248,13 +248,20 @@ add_shortcode( 'ttt_product_grid', function () {
 			$permalink = esc_url( get_permalink() );
 			$title = esc_html( get_the_title() );
 			$price = $p->get_price_html();
-			$out .= '<div class="product-card" style="flex:1 1 calc(33.333% - 8px);min-width:240px;max-width:calc(33.333% - 8px);box-sizing:border-box;">';
+			$in_stock = $p->is_in_stock();
+			$oos_class = $in_stock ? '' : ' out-of-stock';
+
+			$out .= '<div class="product-card'.$oos_class.'" style="flex:1 1 calc(33.333% - 8px);min-width:240px;max-width:calc(33.333% - 8px);box-sizing:border-box;">';
 			$out .= '<a href="'.$permalink.'" style="display:block;text-decoration:none;">';
-			if ($img) $out .= '<img src="'.esc_url($img).'" alt="'.$title.'" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:16px;display:block;" loading="lazy">';
+			if ($img) $out .= '<img src="'.esc_url($img).'" alt="'.$title.'" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:16px;display:block;'.($in_stock ? '' : 'filter:grayscale(100%);opacity:0.5;').'" loading="lazy">';
 			$out .= '<div style="text-align:center;color:#3D0C02;font-size:1rem;font-weight:600;margin:6px 0 2px 0;">'.$title.'</div>';
 			$out .= '</a>';
 			$out .= '<div style="text-align:center;color:#C6742E;font-size:.95rem;font-weight:700;margin:0 0 6px 0;">'.$price.'</div>';
-			$out .= '<a href="'.$cart_url.'" style="display:block;width:fit-content;margin:0 auto;padding:8px 20px;background:#C6742E;color:#fff;border-radius:50px;font-size:.85rem;font-weight:600;text-decoration:none;">Add to cart</a>';
+			if ($in_stock) {
+				$out .= '<a href="'.$cart_url.'" style="display:block;width:fit-content;margin:0 auto;padding:8px 20px;background:#C6742E;color:#fff;border-radius:50px;font-size:.85rem;font-weight:600;text-decoration:none;">Add to cart</a>';
+			} else {
+				$out .= '<span style="display:block;width:fit-content;margin:0 auto;padding:8px 20px;background:#999;color:#fff;border-radius:50px;font-size:.85rem;font-weight:600;">Out of Stock</span>';
+			}
 			$out .= '</div>';
 		}
 		$out .= '</div>';
