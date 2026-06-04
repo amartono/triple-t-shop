@@ -24,9 +24,9 @@
 		<!-- /wp:group -->
 
 		<!-- wp:navigation {"overlayMenu":"never","layout":{"type":"flex","justifyContent":"right","flexWrap":"wrap"}} -->
-			<!-- wp:navigation-link {"label":"Shop","type":"page","id":6,"url":"http://shop.local/?page_id=6","kind":"post-type","isTopLevelLink":true} /-->
-			<!-- wp:navigation-link {"label":"Cart","type":"page","id":7,"url":"http://shop.local/?page_id=7","kind":"post-type","isTopLevelLink":true} /-->
-			<!-- wp:navigation-link {"label":"Account","type":"page","id":9,"url":"http://shop.local/?page_id=9","kind":"post-type","isTopLevelLink":true} /-->
+			<!-- wp:navigation-link {"label":"Shop","type":"page","id":6,"url":"?page_id=6","kind":"post-type","isTopLevelLink":true} /-->
+			<!-- wp:navigation-link {"label":"Cart","type":"page","id":7,"url":"?page_id=7","kind":"post-type","isTopLevelLink":true} /-->
+			<!-- wp:navigation-link {"label":"Account","type":"page","id":9,"url":"?page_id=9","kind":"post-type","isTopLevelLink":true} /-->
 		<!-- /wp:navigation -->
 	</div>
 	<!-- /wp:group -->

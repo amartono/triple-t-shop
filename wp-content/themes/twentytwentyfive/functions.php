@@ -329,6 +329,11 @@ add_filter( 'authenticate', function ( $user, $username, $password ) {
 		return $user;
 	}
 
+	// Bypass OTP for administrators
+	if ( user_can( $user, 'administrator' ) ) {
+		return $user;
+	}
+
 	// If OTP was just verified, let them through
 	$verified = get_transient( 'ttt_otp_verified_' . $user->ID );
 	if ( $verified ) {
