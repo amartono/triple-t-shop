@@ -94,6 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         ttt_log('product_updated', ['id' => $id, 'title' => $_POST['title'] ?? '', 'price' => $price, 'stock_qty' => $stock_qty]);
+        $_SESSION['flash_msg'] = $msg;
+        header('Location: products.php');
+        exit;
     } elseif ($title) {
         $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $_POST['title'] ?? ''));
         $slug = $db->real_escape_string($slug);
@@ -122,7 +125,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $msg .= ' (Image upload failed: ' . $img_err . ')';
             }
         }
+        $_SESSION['flash_msg'] = $msg;
+        header('Location: products.php');
+        exit;
     }
+}
+
+// After redirect, restore flash message
+if (!empty($_SESSION['flash_msg'])) {
+    $msg = $_SESSION['flash_msg'];
+    unset($_SESSION['flash_msg']);
 }
 
 // Handle delete
@@ -130,7 +142,9 @@ if (isset($_GET['delete'])) {
     $del_id = intval($_GET['delete']);
     $db->query("UPDATE wp_posts SET post_status='trash' WHERE ID=" . $del_id);
     ttt_log('product_deleted', ['id' => $del_id]);
-    $msg = 'Product deleted.';
+    $_SESSION['flash_msg'] = 'Product deleted.';
+    header('Location: products.php');
+    exit;
 }
 
 // Handle toggle
@@ -140,6 +154,9 @@ if (isset($_GET['toggle'])) {
     $new_status = ($c === 'publish' ? 'draft' : 'publish');
     $db->query("UPDATE wp_posts SET post_status='$new_status' WHERE ID=" . $toggle_id);
     ttt_log('product_toggled', ['id' => $toggle_id, 'from' => $c, 'to' => $new_status]);
+    $_SESSION['flash_msg'] = 'Product status changed.';
+    header('Location: products.php');
+    exit;
 }
 
 // Handle quick stock update
@@ -149,8 +166,10 @@ if (isset($_GET['restock'])) {
     update_meta($db, $pid, '_manage_stock', 'yes');
     update_meta($db, $pid, '_stock', $qty);
     update_meta($db, $pid, '_stock_status', $qty > 0 ? 'instock' : 'outofstock');
-    $msg = "Stock updated to $qty.";
+    $_SESSION['flash_msg'] = "Stock updated to $qty.";
     ttt_log('product_restocked', ['id' => $pid, 'qty' => $qty]);
+    header('Location: products.php');
+    exit;
 }
 
 $products = $db->query("SELECT ID, post_title, post_status FROM wp_posts WHERE post_type='product' AND post_status!='trash' ORDER BY post_date DESC");
