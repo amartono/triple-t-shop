@@ -663,3 +663,96 @@ add_action( 'woocommerce_add_to_cart', function ( $cart_item_key, $product_id ) 
         ttt_log( 'add_to_cart', [ 'product_id' => $product_id, 'cart_key' => $cart_item_key ] );
     }
 }, 10, 2 );
+
+// Log cart item removal
+add_action( 'woocommerce_remove_cart_item', function ( $cart_item_key, $cart ) {
+    if ( function_exists( 'ttt_log' ) ) {
+        $item = $cart->get_cart_item( $cart_item_key );
+        $product_id = $item['product_id'] ?? 0;
+        ttt_log( 'remove_from_cart', [ 'product_id' => $product_id, 'cart_key' => $cart_item_key ] );
+    }
+}, 10, 2 );
+
+// Log cart quantity changes
+add_action( 'woocommerce_after_cart_item_quantity_update', function ( $cart_item_key, $quantity, $old_quantity ) {
+    if ( function_exists( 'ttt_log' ) ) {
+        ttt_log( 'cart_quantity_changed', [
+            'cart_key' => $cart_item_key,
+            'from'     => $old_quantity,
+            'to'       => $quantity,
+        ]);
+    }
+}, 10, 3 );
+
+// Log page views
+add_action( 'template_redirect', function () {
+    if ( ! function_exists( 'ttt_log' ) ) return;
+    if ( is_admin() ) return;
+    if ( wp_doing_ajax() || defined( 'REST_REQUEST' ) ) return;
+
+    $context = 'page';
+    $page_id = null;
+
+    if ( is_shop() || is_post_type_archive( 'product' ) ) {
+        $context = 'shop';
+    } elseif ( is_product() ) {
+        $context = 'product';
+        $page_id = get_the_ID();
+    } elseif ( is_product_category() ) {
+        $context = 'product_category';
+        $term = get_queried_object();
+        $page_id = $term->term_id;
+    } elseif ( is_cart() ) {
+        $context = 'cart';
+    } elseif ( is_checkout() ) {
+        $context = 'checkout';
+    } elseif ( is_account_page() ) {
+        $context = 'my_account';
+    } elseif ( is_home() || is_front_page() ) {
+        $context = 'home';
+    } elseif ( is_page() ) {
+        $context = 'page';
+        $page_id = get_the_ID();
+    }
+
+    $data = [ 'context' => $context ];
+    if ( $page_id ) $data['page_id'] = $page_id;
+    if ( is_user_logged_in() ) {
+        $user = wp_get_current_user();
+        $data['user_id'] = $user->ID;
+    }
+
+    ttt_log( 'page_view', $data );
+}, 999 );
+
+// Log product detail views
+add_action( 'template_redirect', function () {
+    if ( ! is_product() ) return;
+    if ( ! function_exists( 'ttt_log' ) ) return;
+
+    $product = wc_get_product( get_the_ID() );
+    if ( ! $product ) return;
+
+    ttt_log( 'product_view', [
+        'product_id'   => get_the_ID(),
+        'product_name' => $product->get_name(),
+        'price'        => $product->get_price(),
+        'in_stock'     => $product->is_in_stock(),
+    ]);
+}, 998 );
+
+// Log search queries
+add_action( 'template_redirect', function () {
+    if ( ! function_exists( 'ttt_log' ) ) return;
+    $search = $_GET['s'] ?? $_GET['ttt_search'] ?? '';
+    if ( empty( $search ) ) return;
+
+    ttt_log( 'search', [ 'query' => sanitize_text_field( $search ) ] );
+}, 997 );
+
+// Log user logout
+add_action( 'wp_logout', function ( $user_id ) {
+    if ( function_exists( 'ttt_log' ) ) {
+        ttt_log( 'user_logout', [ 'user_id' => $user_id ] );
+    }
+});
