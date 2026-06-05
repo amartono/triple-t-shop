@@ -49,7 +49,7 @@ admin_header('Audit Log');
 <div class="audit-toolbar">
     <div>
         <label>Search</label>
-        <input type="search" id="audit-search" placeholder="Search actions, IPs, details..." oninput="renderAudit()">
+        <input type="search" id="audit-search" placeholder="Search actions, IPs, details..." onkeydown="if(event.key==='Enter')renderAudit()">
     </div>
     <div>
         <label>Level</label>
@@ -69,7 +69,8 @@ admin_header('Audit Log');
         <label>To</label>
         <input type="date" id="audit-to" onchange="renderAudit()">
     </div>
-    <button class="btn-sm" onclick="clearFilters()">Clear Filters</button>
+    <button class="btn-sm" onclick="renderAudit()" style="margin-top:auto;">Search</button>
+    <button class="btn-sm btn-sm-dim" onclick="clearFilters()" style="margin-top:auto;">Clear</button>
 </div>
 
 <div class="audit-summary" id="audit-summary"></div>
