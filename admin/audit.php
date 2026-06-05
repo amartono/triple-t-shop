@@ -71,6 +71,7 @@ admin_header('Audit Log');
     </div>
     <button class="btn-sm" onclick="renderAudit()" style="margin-top:auto;">Search</button>
     <button class="btn-sm btn-sm-dim" onclick="clearFilters()" style="margin-top:auto;">Clear</button>
+    <button class="btn-sm" onclick="exportCSV()" style="margin-top:auto;background:#198754;color:#fff;">Export CSV</button>
 </div>
 
 <div class="audit-summary" id="audit-summary"></div>
@@ -203,6 +204,38 @@ function clearFilters() {
     document.getElementById('audit-to').value = '';
     currentPage = 1;
     renderAudit();
+}
+
+function exportCSV() {
+    var filtered = getFilteredLogs();
+    if (filtered.length === 0) { alert('No entries to export.'); return; }
+
+    var escapeCSV = function(s) { return '"' + String(s).replace(/"/g, '""') + '"'; };
+
+    var header = ['Timestamp','Level','Action','IP','User','Method','URI','Details'].map(escapeCSV).join(',');
+    var rows = filtered.map(function(e) {
+        var details = JSON.stringify(e.data || {}).replace(/"/g, '""');
+        return [
+            escapeCSV(e.timestamp || ''),
+            escapeCSV(e.level || ''),
+            escapeCSV(e.action || ''),
+            escapeCSV(e.ip || ''),
+            escapeCSV(getUser(e) || ''),
+            escapeCSV(e.method || ''),
+            escapeCSV(e.uri || ''),
+            escapeCSV(details)
+        ].join(',');
+    });
+    var csv = [header].concat(rows).join('\n');
+    var blob = new Blob(['\uFEFF' + csv], {type: 'text/csv;charset=utf-8;'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'audit-log-' + new Date().toISOString().substring(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
 renderAudit();
