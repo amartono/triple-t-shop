@@ -95,7 +95,7 @@ admin_header('Audit Log');
 <script>
 var ALL_LOGS = <?= json_encode($all_logs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
 var LEVEL_COLORS = <?= json_encode($level_colors) ?>;
-var PER_PAGE = 50;
+var PER_PAGE = 25;
 var currentPage = 1;
 
 function pad(n) { return n < 10 ? '0' + n : '' + n; }
