@@ -4,25 +4,59 @@ require_admin();
 
 $msg = '';
 
-function handle_image_upload($db, $file, $product_id) {
-    if (empty($file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) return false;
+function handle_image_upload($db, $file, $product_id, &$err = null) {
+    if (empty($file['tmp_name']) || $file['error'] !== UPLOAD_ERR_OK) {
+        $codes = [
+            UPLOAD_ERR_INI_SIZE   => 'File too large (exceeds server limit)',
+            UPLOAD_ERR_FORM_SIZE  => 'File too large (exceeds form limit)',
+            UPLOAD_ERR_PARTIAL    => 'File was only partially uploaded',
+            UPLOAD_ERR_NO_FILE    => 'No file was uploaded',
+            UPLOAD_ERR_NO_TMP_DIR => 'Server temp directory missing',
+            UPLOAD_ERR_CANT_WRITE => 'Cannot write file to disk',
+        ];
+        $err_code = $file['error'] ?? UPLOAD_ERR_NO_FILE;
+        $err = $codes[$err_code] ?? 'Upload error code: ' . $err_code;
+        return false;
+    }
 
     $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    if (!in_array($ext, ['jpg','jpeg','png','webp','gif'])) return false;
+    if (!in_array($ext, ['jpg','jpeg','png','webp','gif'])) {
+        $err = 'Invalid file type: .' . $ext;
+        return false;
+    }
 
-    $upload_dir = '/opt/homebrew/var/www/wp-content/uploads/' . date('Y') . '/' . date('m');
-    if (!is_dir($upload_dir)) mkdir($upload_dir, 0755, true);
+    $upload_base = TRIPLET_ROOT . '/wp-content/uploads';
+    $upload_dir = $upload_base . '/' . date('Y') . '/' . date('m');
+    if (!is_dir($upload_dir)) {
+        if (!mkdir($upload_dir, 0755, true)) {
+            $err = 'Cannot create upload directory: ' . $upload_dir;
+            return false;
+        }
+    }
+    if (!is_writable($upload_dir)) {
+        $err = 'Upload directory not writable: ' . $upload_dir;
+        return false;
+    }
 
     $filename = 'product-' . $product_id . '-' . time() . '.' . $ext;
     $dest = $upload_dir . '/' . $filename;
 
-    if (!move_uploaded_file($file['tmp_name'], $dest)) return false;
+    if (!move_uploaded_file($file['tmp_name'], $dest) && !copy($file['tmp_name'], $dest)) {
+        $err = 'Failed to save uploaded file to ' . $dest;
+        return false;
+    }
 
     $rel_path = date('Y') . '/' . date('m') . '/' . $filename;
-    $mime = $file['type'];
+    $mime = $db->real_escape_string($file['type']);
     $title = $db->real_escape_string($file['name']);
 
-    $db->query("INSERT INTO wp_posts (post_title,post_content,post_excerpt,to_ping,pinged,post_content_filtered,post_name,post_status,post_type,post_mime_type,post_date,post_date_gmt) VALUES ('$title','','','','','','attachment-{$product_id}','inherit','attachment','$mime',NOW(),UTC_TIMESTAMP())");
+    $db->query("INSERT INTO wp_posts (post_title,post_content,post_excerpt,to_ping,pinged,post_content_filtered,post_name,post_status,post_type,post_mime_type,guid,post_date,post_date_gmt) VALUES ('$title','','','','','','attachment-{$product_id}','inherit','attachment','$mime','$rel_path',NOW(),UTC_TIMESTAMP())");
+
+    if ($db->error) {
+        $err = 'Database error: ' . $db->error;
+        return false;
+    }
+
     $attach_id = $db->insert_id;
 
     update_meta($db, $attach_id, '_wp_attached_file', $rel_path);
@@ -52,11 +86,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             update_meta($db, $id, '_stock_status', $stock_qty > 0 ? 'instock' : 'outofstock');
         }
 
-        if (!empty($_FILES['product_image']['tmp_name'])) {
-            handle_image_upload($db, $_FILES['product_image'], $id);
-        }
-
         $msg = 'Product updated!';
+        if (!empty($_FILES['product_image']['tmp_name'])) {
+            $img_err = null;
+            if (!handle_image_upload($db, $_FILES['product_image'], $id, $img_err)) {
+                $msg .= ' (Image upload failed: ' . $img_err . ')';
+            }
+        }
         ttt_log('product_updated', ['id' => $id, 'title' => $_POST['title'] ?? '', 'price' => $price, 'stock_qty' => $stock_qty]);
     } elseif ($title) {
         $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $_POST['title'] ?? ''));
@@ -81,7 +117,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ttt_log('product_created', ['id' => $new, 'title' => $_POST['title'] ?? '', 'price' => $price, 'stock_qty' => $stock_qty]);
 
         if (!empty($_FILES['product_image']['tmp_name'])) {
-            handle_image_upload($db, $_FILES['product_image'], $new);
+            $img_err = null;
+            if (!handle_image_upload($db, $_FILES['product_image'], $new, $img_err)) {
+                $msg .= ' (Image upload failed: ' . $img_err . ')';
+            }
         }
     }
 }
