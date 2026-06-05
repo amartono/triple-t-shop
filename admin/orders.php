@@ -66,7 +66,7 @@ admin_header('Orders');
     ?>
         <tr>
             <td><strong>#<?= $o['id'] ?></strong></td>
-            <td><?= $o['date_created_gmt'] ? date('M j, Y', strtotime($o['date_created_gmt'])) : '—' ?></td>
+            <td><?= $o['date_created_gmt'] ? date('Y-m-d H:i', strtotime($o['date_created_gmt'])) : '—' ?></td>
             <td><?= htmlspecialchars(trim(($o['first_name']??'').' '.($o['last_name']??'')) ?: 'N/A') ?><br><small style="color:#888;"><?= htmlspecialchars($o['email'] ?? '') ?></small></td>
             <td>$<?= number_format($o['total_amount'] ?? 0, 2) ?></td>
             <td><span class="badge" style="background:<?= status_color($o['status']) ?>;color:#fff;"><?= htmlspecialchars($label) ?></span></td>

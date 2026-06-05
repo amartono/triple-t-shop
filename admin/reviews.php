@@ -27,7 +27,7 @@ admin_header('Reviews');
             <td><?= htmlspecialchars($r['product_name']) ?></td>
             <td><?= htmlspecialchars($r['comment_author']) ?><br><small><?= htmlspecialchars($r['comment_author_email']) ?></small></td>
             <td style="max-width:300px"><?= htmlspecialchars(substr($r['comment_content'], 0, 150)) ?><?= strlen($r['comment_content'])>150?'...':'' ?></td>
-            <td><?= date('M j, Y', strtotime($r['comment_date'])) ?></td>
+            <td><?= date('Y-m-d H:i', strtotime($r['comment_date'])) ?></td>
             <td><span class="badge <?= $r['comment_approved']==='1'?'badge-publish':($r['comment_approved']==='0'?'badge-draft':'') ?>"><?= $r['comment_approved']==='1'?'Approved':($r['comment_approved']==='0'?'Pending':'Trash') ?></span></td>
             <td class="actions">
                 <?php if ($r['comment_approved'] === '0'): ?>

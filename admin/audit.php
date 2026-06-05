@@ -102,7 +102,7 @@ function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
 function formatDate(ts) {
     var d = new Date(ts);
-    return (d.getMonth()+1) + '/' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
 }
 
 function formatData(data) {
