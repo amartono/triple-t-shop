@@ -226,6 +226,64 @@ add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_script( 'ttt-chatbot', get_template_directory_uri() . '/assets/js/chatbot.js', array(), '1.0', true );
 });
 
+function twentytwentyfive_pagination( $current, $total ) {
+	if ( $total <= 1 ) return '';
+
+	$out  = '';
+	$base = home_url( '/?post_type=product&paged=%#%' );
+
+	$out .= '<div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:24px;">';
+
+	if ( $current > 1 ) {
+		$out .= '<a href="' . str_replace('%#%', $current - 1, $base) . '" class="ttt-page-btn">← Prev</a>';
+	} else {
+		$out .= '<span class="ttt-page-btn ttt-page-disabled">← Prev</span>';
+	}
+
+	if ( $total <= 7 ) {
+		for ( $i = 1; $i <= $total; $i++ ) {
+			$out .= $i === $current
+				? '<span class="ttt-page-btn ttt-page-active">' . $i . '</span>'
+				: '<a href="' . str_replace('%#%', $i, $base) . '" class="ttt-page-btn">' . $i . '</a>';
+		}
+	} elseif ( $current <= 4 ) {
+		for ( $i = 1; $i <= 4; $i++ ) {
+			$out .= $i === $current
+				? '<span class="ttt-page-btn ttt-page-active">' . $i . '</span>'
+				: '<a href="' . str_replace('%#%', $i, $base) . '" class="ttt-page-btn">' . $i . '</a>';
+		}
+		$out .= '<span class="ttt-page-ellipsis">…</span>';
+		$out .= '<a href="' . str_replace('%#%', $total, $base) . '" class="ttt-page-btn">' . $total . '</a>';
+	} elseif ( $current >= $total - 3 ) {
+		$out .= '<a href="' . str_replace('%#%', 1, $base) . '" class="ttt-page-btn">1</a>';
+		$out .= '<span class="ttt-page-ellipsis">…</span>';
+		for ( $i = $total - 3; $i <= $total; $i++ ) {
+			$out .= $i === $current
+				? '<span class="ttt-page-btn ttt-page-active">' . $i . '</span>'
+				: '<a href="' . str_replace('%#%', $i, $base) . '" class="ttt-page-btn">' . $i . '</a>';
+		}
+	} else {
+		$out .= '<a href="' . str_replace('%#%', 1, $base) . '" class="ttt-page-btn">1</a>';
+		$out .= '<span class="ttt-page-ellipsis">…</span>';
+		for ( $i = $current - 2; $i <= $current + 2; $i++ ) {
+			$out .= $i === $current
+				? '<span class="ttt-page-btn ttt-page-active">' . $i . '</span>'
+				: '<a href="' . str_replace('%#%', $i, $base) . '" class="ttt-page-btn">' . $i . '</a>';
+		}
+		$out .= '<span class="ttt-page-ellipsis">…</span>';
+		$out .= '<a href="' . str_replace('%#%', $total, $base) . '" class="ttt-page-btn">' . $total . '</a>';
+	}
+
+	if ( $current < $total ) {
+		$out .= '<a href="' . str_replace('%#%', $current + 1, $base) . '" class="ttt-page-btn">Next →</a>';
+	} else {
+		$out .= '<span class="ttt-page-btn ttt-page-disabled">Next →</span>';
+	}
+
+	$out .= '</div>';
+	return $out;
+}
+
 // Custom shop template via shortcode
 add_shortcode( 'ttt_product_grid', function () {
 	/**
@@ -266,7 +324,9 @@ add_shortcode( 'ttt_product_grid', function () {
 		}
 		$out .= '</div>';
 		if ($wp_query->max_num_pages > 1) {
-			$out .= '<div style="text-align:center;margin-top:24px;display:flex;flex-direction:row;justify-content:center;gap:8px;flex-wrap:nowrap;">' . paginate_links(array('current' => max(1, get_query_var('paged')), 'total' => $wp_query->max_num_pages, 'prev_text' => '&laquo;', 'next_text' => '&raquo;')) . '</div>';
+			$out .= '<div class="ttt-pagination">';
+			$out .= twentytwentyfive_pagination( max(1, get_query_var('paged')), $wp_query->max_num_pages );
+			$out .= '</div>';
 		}
 		wp_reset_postdata();
 	} else {
