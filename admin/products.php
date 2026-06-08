@@ -62,6 +62,21 @@ function handle_image_upload($db, $file, $product_id, &$err = null) {
     update_meta($db, $attach_id, '_wp_attached_file', $rel_path);
     update_meta($db, $product_id, '_thumbnail_id', $attach_id);
 
+    // Generate WordPress image sizes (srcset, large_image, etc.)
+    $wp_load = TRIPLET_ROOT . '/wp-load.php';
+    if (file_exists($wp_load)) {
+        @include_once $wp_load;
+        if (function_exists('wp_generate_attachment_metadata')) {
+            $full_path = TRIPLET_ROOT . '/wp-content/uploads/' . $rel_path;
+            require_once TRIPLET_ROOT . '/wp-admin/includes/image.php';
+            $metadata = wp_generate_attachment_metadata($attach_id, $full_path);
+            if ($metadata) {
+                $meta_json = $db->real_escape_string(json_encode($metadata));
+                $db->query("INSERT INTO wp_postmeta (post_id, meta_key, meta_value) VALUES ($attach_id, '_wp_attachment_metadata', '$meta_json') ON DUPLICATE KEY UPDATE meta_value='$meta_json'");
+            }
+        }
+    }
+
     ttt_log('product_image_uploaded', ['product_id' => $product_id, 'attachment_id' => $attach_id, 'file' => $rel_path]);
 
     return $rel_path;
@@ -98,14 +113,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: products.php');
         exit;
     } elseif ($title) {
-        $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $_POST['title'] ?? ''));
-        $slug = $db->real_escape_string($slug);
-        $db->query("INSERT INTO wp_posts (post_title,post_content,post_excerpt,to_ping,pinged,post_content_filtered,post_name,post_status,post_type,post_date,post_date_gmt) VALUES ('$title','$desc','','','','','$slug','publish','product',NOW(),UTC_TIMESTAMP())");
-        $new = $db->insert_id;
-        update_meta($db, $new, '_price', $price);
-        update_meta($db, $new, '_regular_price', $price);
-        update_meta($db, $new, '_visibility', 'visible');
-        update_meta($db, $new, '_product_type', 'simple');
+    $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $_POST['title'] ?? ''));
+    $slug = $db->real_escape_string($slug);
+    // Ensure unique slug
+    $existing = $db->query("SELECT ID FROM wp_posts WHERE post_name='$slug' AND post_type='product' AND post_status!='trash'");
+    if ($existing && $existing->num_rows > 0) {
+        $slug .= '-' . time();
+    }
+    $db->query("INSERT INTO wp_posts (post_title,post_content,post_excerpt,to_ping,pinged,post_content_filtered,post_name,post_status,post_type,post_date,post_date_gmt) VALUES ('$title','$desc','','','','','$slug','publish','product',NOW(),UTC_TIMESTAMP())");
+    $new = $db->insert_id;
+    update_meta($db, $new, '_price', $price);
+    update_meta($db, $new, '_regular_price', $price);
+    update_meta($db, $new, '_visibility', 'visible');
+    update_meta($db, $new, '_product_type', 'simple');
+
+    // WooCommerce required defaults
+    update_meta($db, $new, '_tax_status', 'taxable');
+    update_meta($db, $new, '_tax_class', '');
+    update_meta($db, $new, '_virtual', 'no');
+    update_meta($db, $new, '_downloadable', 'no');
+    update_meta($db, $new, '_sold_individually', 'no');
+    update_meta($db, $new, '_backorders', 'no');
+    update_meta($db, $new, '_sku', '');
+    update_meta($db, $new, '_product_version', '10.7.0');
+
+    // Assign default category
+    $cat = $db->query("SELECT tt.term_taxonomy_id FROM wp_terms t JOIN wp_term_taxonomy tt ON t.term_id=tt.term_id WHERE t.name='Uncategorized' AND tt.taxonomy='product_cat' LIMIT 1");
+    if ($cat && $cat->num_rows > 0) {
+        $tt_id = $cat->fetch_column();
+        $db->query("INSERT INTO wp_term_relationships (object_id, term_taxonomy_id) VALUES ($new, $tt_id)");
+    }
 
         if ($stock_qty >= 0) {
             update_meta($db, $new, '_manage_stock', 'yes');
@@ -140,7 +177,7 @@ if (!empty($_SESSION['flash_msg'])) {
 // Handle delete
 if (isset($_GET['delete'])) {
     $del_id = intval($_GET['delete']);
-    $db->query("UPDATE wp_posts SET post_status='trash' WHERE ID=" . $del_id);
+    $db->query("UPDATE wp_posts SET post_status='trash', post_name=CONCAT(post_name,'-trash-',$del_id) WHERE ID=" . $del_id);
     ttt_log('product_deleted', ['id' => $del_id]);
     $_SESSION['flash_msg'] = 'Product deleted.';
     header('Location: products.php');
