@@ -224,7 +224,7 @@ add_action( 'wp_enqueue_scripts', function () {
 	 * Handles product questions, add-to-cart, and shop navigation.
 	 */
 	if ( function_exists( 'is_checkout' ) && is_checkout() ) return;
-	wp_enqueue_script( 'ttt-chatbot', get_template_directory_uri() . '/assets/js/chatbot.js', array(), '1.0', true );
+	wp_enqueue_script( 'ttt-chatbot', get_template_directory_uri() . '/assets/js/chatbot.js', array(), '1.1', true );
 });
 
 function twentytwentyfive_pagination( $current, $total ) {
@@ -815,5 +815,54 @@ add_action( 'template_redirect', function () {
 add_action( 'wp_logout', function ( $user_id ) {
     if ( function_exists( 'ttt_log' ) ) {
         ttt_log( 'user_logout', [ 'user_id' => $user_id ] );
+    }
+});
+
+// Log product reviews
+add_action( 'comment_post', function ( $comment_id, $status, $commentdata ) {
+    if ( ! function_exists( 'ttt_log' ) ) return;
+    $product_id = $commentdata['comment_post_ID'] ?? 0;
+    if ( ! $product_id ) return;
+    $post = get_post( $product_id );
+    if ( ! $post || $post->post_type !== 'product' ) return;
+    $rating = get_comment_meta( $comment_id, 'rating', true );
+    ttt_log( 'review_submitted', [
+        'review_id'   => $comment_id,
+        'product_id'  => $product_id,
+        'product_name'=> $post->post_title,
+        'rating'      => $rating ? $rating . ' stars' : 'no rating',
+        'user_id'     => $commentdata['user_id'] ?? 0,
+        'status'      => $status
+    ]);
+}, 10, 3 );
+
+// Log chatbot interactions via AJAX
+add_action( 'wc_ajax_ttt_chatbot_log', 'ttt_chatbot_log_handler' );
+function ttt_chatbot_log_handler() {
+    if ( ! function_exists( 'ttt_log' ) ) { wp_die(); }
+    $action = sanitize_text_field( $_POST['chat_action'] ?? 'chatbot_interaction' );
+    $message = sanitize_text_field( $_POST['message'] ?? '' );
+    $intent  = sanitize_text_field( $_POST['intent'] ?? '' );
+    ttt_log( $action, [
+        'message' => substr( $message, 0, 200 ),
+        'intent'  => $intent,
+    ]);
+    wp_send_json_success();
+}
+
+// Log WooCommerce settings changes
+add_action( 'woocommerce_settings_saved', function () {
+    if ( function_exists( 'ttt_log' ) ) {
+        ttt_log( 'settings_changed', [ 'context' => 'woocommerce' ] );
+    }
+});
+
+// Log failed payment / checkout errors
+add_action( 'woocommerce_checkout_process', function () {
+    if ( function_exists( 'ttt_log' ) ) {
+        $errors = wc_get_notices( 'error' );
+        if ( ! empty( $errors ) ) {
+            ttt_log( 'checkout_error', [ 'errors' => wp_list_pluck( $errors, 'notice' ) ], 'WARN' );
+        }
     }
 });
