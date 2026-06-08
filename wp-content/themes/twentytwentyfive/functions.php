@@ -223,6 +223,7 @@ add_action( 'wp_enqueue_scripts', function () {
 	 * Creates a floating chat button (bottom-right) powered by Groq AI API.
 	 * Handles product questions, add-to-cart, and shop navigation.
 	 */
+	if ( function_exists( 'is_checkout' ) && is_checkout() ) return;
 	wp_enqueue_script( 'ttt-chatbot', get_template_directory_uri() . '/assets/js/chatbot.js', array(), '1.0', true );
 });
 
