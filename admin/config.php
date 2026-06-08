@@ -1,6 +1,16 @@
 <?php
 // Admin Panel Config — standalone, no WordPress dependency
 session_start();
+
+// Session security: regenerate ID periodically
+if (empty($_SESSION['_created'])) {
+    $_SESSION['_created'] = time();
+    session_regenerate_id(true);
+} elseif (time() - $_SESSION['_created'] > 3600) {
+    session_regenerate_id(true);
+    $_SESSION['_created'] = time();
+}
+
 define('TRIPLET_ROOT', dirname(__DIR__));
 define('ADMIN_USER', 'admin');
 define('DB_HOST', 'localhost');
@@ -11,6 +21,26 @@ define('DB_NAME', 'wordpress');
 require_once TRIPLET_ROOT . '/wp-content/mu-plugins/logger.php';
 
 $db = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+
+function admin_nonce() {
+    if (empty($_SESSION['admin_nonce'])) {
+        $_SESSION['admin_nonce'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['admin_nonce'];
+}
+
+function admin_verify_nonce($nonce) {
+    if (empty($_SESSION['admin_nonce']) || empty($nonce)) return false;
+    return hash_equals($_SESSION['admin_nonce'], $nonce);
+}
+
+function admin_require_nonce() {
+    $nonce = $_POST['_admin_nonce'] ?? $_GET['_admin_nonce'] ?? '';
+    if (!admin_verify_nonce($nonce)) {
+        http_response_code(403);
+        die('Invalid or expired security token. Please go back and refresh the page.');
+    }
+}
 
 function is_admin_logged_in() {
     return !empty($_SESSION['admin_logged_in']);

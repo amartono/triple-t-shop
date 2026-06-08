@@ -866,3 +866,13 @@ add_action( 'woocommerce_checkout_process', function () {
         }
     }
 });
+
+// Security HTTP headers
+add_action( 'send_headers', function () {
+    header( 'X-Content-Type-Options: nosniff' );
+    header( 'X-Frame-Options: SAMEORIGIN' );
+    header( 'Referrer-Policy: strict-origin-when-cross-origin' );
+    if ( is_ssl() ) {
+        header( 'Strict-Transport-Security: max-age=31536000' );
+    }
+});

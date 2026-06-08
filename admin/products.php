@@ -75,8 +75,9 @@ function handle_image_upload($db, $file, $product_id, &$err = null) {
 
 // Handle CRUD
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    admin_require_nonce();
     $id = intval($_POST['product_id'] ?? 0);
-    $title = $db->real_escape_string($_POST['title'] ?? '');
+    $title = $db->real_escape_string(strip_tags($_POST['title'] ?? ''));
     $desc = $db->real_escape_string($_POST['description'] ?? '');
     $price = floatval($_POST['price'] ?? 0);
     $stock_qty = intval($_POST['stock_qty'] ?? -1);
@@ -167,6 +168,7 @@ if (!empty($_SESSION['flash_msg'])) {
 
 // Handle delete
 if (isset($_GET['delete'])) {
+    admin_require_nonce();
     $del_id = intval($_GET['delete']);
     $db->query("UPDATE wp_posts SET post_status='trash', post_name=CONCAT(post_name,'-trash-',$del_id) WHERE ID=" . $del_id);
     ttt_log('product_deleted', ['id' => $del_id]);
@@ -177,6 +179,7 @@ if (isset($_GET['delete'])) {
 
 // Handle toggle
 if (isset($_GET['toggle'])) {
+    admin_require_nonce();
     $toggle_id = intval($_GET['toggle']);
     $c = $db->query("SELECT post_status FROM wp_posts WHERE ID=" . $toggle_id)->fetch_column();
     $new_status = ($c === 'publish' ? 'draft' : 'publish');
@@ -189,6 +192,7 @@ if (isset($_GET['toggle'])) {
 
 // Handle quick stock update
 if (isset($_GET['restock'])) {
+    admin_require_nonce();
     $qty = intval($_GET['restock_qty'] ?? 100);
     $pid = intval($_GET['restock']);
     update_meta($db, $pid, '_manage_stock', 'yes');
@@ -215,6 +219,7 @@ admin_header('Products');
 <button class="btn" onclick="document.getElementById('pf').classList.toggle('hidden')">+ New Product</button>
 
 <form method="post" enctype="multipart/form-data" id="pf" class="product-form <?= $edit ? '' : 'hidden' ?>">
+    <input type="hidden" name="_admin_nonce" value="<?= admin_nonce() ?>">
     <h3><?= $edit ? 'Edit Product #'.$edit['ID'] : 'New Product' ?></h3>
     <?php if ($edit): ?><input type="hidden" name="product_id" value="<?= $edit['ID'] ?>"><?php endif; ?>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
@@ -275,11 +280,11 @@ admin_header('Products');
             </td>
             <td><span class="badge <?= $p['post_status']==='publish'?'badge-publish':'badge-draft' ?>"><?= $p['post_status'] ?></span></td>
             <td class="actions">
-                <a href="?edit=<?= $p['ID'] ?>" class="btn-sm">Edit</a>
-                <a href="?restock=<?= $p['ID'] ?>&restock_qty=50" class="btn-sm">+50</a>
-                <a href="?restock=<?= $p['ID'] ?>&restock_qty=100" class="btn-sm btn-sm-dim">+100</a>
-                <a href="?toggle=<?= $p['ID'] ?>" class="btn-sm btn-sm-dim"><?= $p['post_status']==='publish'?'Hide':'Show' ?></a>
-                <a href="?delete=<?= $p['ID'] ?>" class="btn-sm btn-sm-del" onclick="return confirm('Delete?')">Del</a>
+                <a href="?edit=<?= $p['ID'] ?>&_admin_nonce=<?= admin_nonce() ?>" class="btn-sm">Edit</a>
+                <a href="?restock=<?= $p['ID'] ?>&restock_qty=50&_admin_nonce=<?= admin_nonce() ?>" class="btn-sm">+50</a>
+                <a href="?restock=<?= $p['ID'] ?>&restock_qty=100&_admin_nonce=<?= admin_nonce() ?>" class="btn-sm btn-sm-dim">+100</a>
+                <a href="?toggle=<?= $p['ID'] ?>&_admin_nonce=<?= admin_nonce() ?>" class="btn-sm btn-sm-dim"><?= $p['post_status']==='publish'?'Hide':'Show' ?></a>
+                <a href="?delete=<?= $p['ID'] ?>&_admin_nonce=<?= admin_nonce() ?>" class="btn-sm btn-sm-del" onclick="return confirm('Delete?')">Del</a>
             </td>
         </tr>
     <?php endwhile; ?>

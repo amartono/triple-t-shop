@@ -8,6 +8,7 @@ if (is_admin_logged_in()) {
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    admin_require_nonce();
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
@@ -45,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <p class="sub">Tung Tung Tung Sahur</p>
     <?php if ($error): ?><p class="error"><?= $error ?></p><?php endif; ?>
     <form method="post">
+        <input type="hidden" name="_admin_nonce" value="<?= admin_nonce() ?>">
         <label>Username</label>
         <input type="text" name="username" required autofocus>
         <label>Password</label>
