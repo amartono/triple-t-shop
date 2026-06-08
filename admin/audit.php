@@ -184,6 +184,8 @@ function renderAudit() {
     var html = '';
     var end = totalPages;
 
+    html += '<button onclick="goPage(' + Math.max(1, currentPage - 1) + ')"' + (currentPage === 1 ? ' disabled style="opacity:0.4;"' : '') + '>← Prev</button>';
+
     if (end <= 7) {
         for (var i = 1; i <= end; i++) {
             html += pageBtn(i);
@@ -203,6 +205,8 @@ function renderAudit() {
         html += jumpInput(end);
         html += pageBtn(end);
     }
+
+    html += '<button onclick="goPage(' + Math.min(end, currentPage + 1) + ')"' + (currentPage === end ? ' disabled style="opacity:0.4;"' : '') + '>Next →</button>';
     pag.innerHTML = html;
 }
 
