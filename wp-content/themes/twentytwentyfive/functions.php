@@ -232,7 +232,7 @@ function twentytwentyfive_pagination( $current, $total ) {
 	$out  = '';
 	$base = home_url( '/?post_type=product&paged=%#%' );
 
-	$out .= '<div style="display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:24px;">';
+	$out .= '<div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:24px;">';
 
 	if ( $current > 1 ) {
 		$out .= '<a href="' . str_replace('%#%', $current - 1, $base) . '" class="ttt-page-btn">← Prev</a>';

@@ -866,8 +866,8 @@ body.page-id-80 .u-column2::before {
 
 /* Product grid pagination */
 .ttt-page-btn {
-	display: inline-block; padding: 8px 16px; border: 1px solid #ddd; border-radius: 8px;
-	text-decoration: none; color: #3D0C02; font-size: 0.9rem; font-weight: 600;
+	display: inline-block; padding: 10px 18px; border: 1px solid #ddd; border-radius: 8px;
+	text-decoration: none; color: #3D0C02; font-size: 0.95rem; font-weight: 600;
 	transition: background 0.2s, transform 0.2s;
 }
 .ttt-page-btn:hover { background: #f5e6d3; transform: translateY(-2px); }
