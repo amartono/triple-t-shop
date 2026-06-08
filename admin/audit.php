@@ -180,15 +180,38 @@ function renderAudit() {
 
     var pag = document.getElementById('audit-pagination');
     if (totalPages <= 1) { pag.innerHTML = ''; return; }
+
     var html = '';
-    for (var i = 1; i <= totalPages; i++) {
-        if (totalPages > 15 && i > 3 && i < totalPages - 2 && i !== currentPage && Math.abs(i - currentPage) > 2) {
-            if (i === 4) html += '<span style="padding:6px 8px;color:#888;">…</span>';
-            if (i !== currentPage) continue;
+    var end = totalPages;
+
+    if (end <= 7) {
+        for (var i = 1; i <= end; i++) {
+            html += pageBtn(i);
         }
-        html += '<button class="' + (i === currentPage ? 'active' : '') + '" onclick="goPage(' + i + ')">' + i + '</button>';
+    } else if (currentPage <= 4) {
+        for (var i = 1; i <= 4; i++) html += pageBtn(i);
+        html += jumpInput(end);
+        html += pageBtn(end);
+    } else if (currentPage >= end - 3) {
+        html += pageBtn(1);
+        html += jumpInput(end);
+        for (var i = end - 3; i <= end; i++) html += pageBtn(i);
+    } else {
+        html += pageBtn(1);
+        html += jumpInput(end);
+        for (var i = currentPage - 2; i <= currentPage + 2; i++) html += pageBtn(i);
+        html += jumpInput(end);
+        html += pageBtn(end);
     }
     pag.innerHTML = html;
+}
+
+function pageBtn(n) {
+    return '<button class="' + (n === currentPage ? 'active' : '') + '" onclick="goPage(' + n + ')">' + n + '</button>';
+}
+
+function jumpInput(max) {
+    return '<input type="number" min="1" max="' + max + '" placeholder="…" class="jump-input" onkeydown="if(event.key===\'Enter\')goPage(parseInt(this.value)||1)" style="width:48px;padding:4px 6px;border:1px solid #ddd;border-radius:6px;text-align:center;font-size:0.85rem;font-family:inherit;">';
 }
 
 function goPage(p) {
