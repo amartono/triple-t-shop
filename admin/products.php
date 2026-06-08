@@ -62,19 +62,10 @@ function handle_image_upload($db, $file, $product_id, &$err = null) {
     update_meta($db, $attach_id, '_wp_attached_file', $rel_path);
     update_meta($db, $product_id, '_thumbnail_id', $attach_id);
 
-    // Generate WordPress image sizes (srcset, large_image, etc.)
-    $wp_load = TRIPLET_ROOT . '/wp-load.php';
-    if (file_exists($wp_load)) {
-        @include_once $wp_load;
-        if (function_exists('wp_generate_attachment_metadata')) {
-            $full_path = TRIPLET_ROOT . '/wp-content/uploads/' . $rel_path;
-            require_once TRIPLET_ROOT . '/wp-admin/includes/image.php';
-            $metadata = wp_generate_attachment_metadata($attach_id, $full_path);
-            if ($metadata) {
-                $meta_json = $db->real_escape_string(json_encode($metadata));
-                $db->query("INSERT INTO wp_postmeta (post_id, meta_key, meta_value) VALUES ($attach_id, '_wp_attachment_metadata', '$meta_json') ON DUPLICATE KEY UPDATE meta_value='$meta_json'");
-            }
-        }
+    // Generate WordPress image sizes in the background
+    $script = TRIPLET_ROOT . '/admin/regenerate-thumb.php';
+    if (file_exists($script)) {
+        exec('php ' . escapeshellarg($script) . ' ' . intval($attach_id) . ' > /dev/null 2>&1 &');
     }
 
     ttt_log('product_image_uploaded', ['product_id' => $product_id, 'attachment_id' => $attach_id, 'file' => $rel_path]);
